@@ -59,7 +59,6 @@ class UserListItem extends StatelessWidget {
               ],
             ),
             SizedBox(width: 12),
-            // Məlumat
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +82,6 @@ class UserListItem extends StatelessWidget {
                 ],
               ),
             ),
-            // Mesaj düyməsi
             Container(
               decoration: BoxDecoration(
                 color: Color(0xFF2563EB).withOpacity(0.1),

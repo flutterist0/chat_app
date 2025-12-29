@@ -1,7 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import əlavə olunub
 import 'package:flutter/material.dart';
 import 'package:test_app/feature/auth/presentation/register_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
+import 'package:test_app/shared/routers/app_router.dart';
+
+import '../data/auth_service.dart';
 
 @RoutePage()
 class LoginScreen extends StatefulWidget {
@@ -13,22 +17,38 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
-      // Simulyasiya üçün 2 saniyə gözlə
-      await Future.delayed(Duration(seconds: 2));
-      
-      setState(() => _isLoading = false);
-      
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ChatsListScreen()),
-      );
+
+      try {
+        await _authService.signIn(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+
+        if (mounted) {
+          context.router.push(ChatsListRoute());
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 
@@ -45,7 +65,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 60),
-                  // Logo və ya ikon
                   Container(
                     width: 100,
                     height: 100,
@@ -62,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 32),
-                  // Başlıq
                   Text(
                     'Xoş gəlmisiniz!',
                     textAlign: TextAlign.center,
@@ -82,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 40),
-                  // Email
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -113,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   SizedBox(height: 16),
-                  // Şifrə
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
@@ -154,12 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   SizedBox(height: 8),
-                  // Şifrəni unutmusunuz?
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Şifrə bərpası funksiyası
                       },
                       child: Text(
                         'Şifrəni unutmusunuz?',
@@ -171,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 24),
-                  // Daxil ol düyməsi
                   ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
@@ -185,23 +198,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: _isLoading
                         ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
                         : Text(
-                            'Daxil ol',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                      'Daxil ol',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                   SizedBox(height: 24),
-                  // Qeydiyyat linki
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

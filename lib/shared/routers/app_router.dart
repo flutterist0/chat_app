@@ -7,14 +7,17 @@ import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/search_users_screen.dart';
+
+import '../../splash_screen.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig()
 class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
+        AutoRoute(page: SplashRoute.page, initial: true),
         /// routes go here
-        AutoRoute(page: ChatsListRoute.page, initial: true),
+        AutoRoute(page: ChatsListRoute.page),
         AutoRoute(page: ChatRoute.page),
         AutoRoute(page: SearchUsersRoute.page),
         AutoRoute(page: LoginRoute.page),

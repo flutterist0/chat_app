@@ -23,11 +23,9 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     ChatsListRoute.name: (routeData) {
-      final args = routeData.argsAs<ChatsListRouteArgs>(
-          orElse: () => const ChatsListRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: ChatsListScreen(key: args.key),
+        child: const ChatsListScreen(),
       );
     },
     LoginRoute.name: (routeData) {
@@ -46,6 +44,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: SearchUsersScreen(),
+      );
+    },
+    SplashRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const SplashScreen(),
       );
     },
   };
@@ -81,31 +85,16 @@ class ChatRouteArgs {
 
 /// generated route for
 /// [ChatsListScreen]
-class ChatsListRoute extends PageRouteInfo<ChatsListRouteArgs> {
-  ChatsListRoute({
-    Key? key,
-    List<PageRouteInfo>? children,
-  }) : super(
+class ChatsListRoute extends PageRouteInfo<void> {
+  const ChatsListRoute({List<PageRouteInfo>? children})
+      : super(
           ChatsListRoute.name,
-          args: ChatsListRouteArgs(key: key),
           initialChildren: children,
         );
 
   static const String name = 'ChatsListRoute';
 
-  static const PageInfo<ChatsListRouteArgs> page =
-      PageInfo<ChatsListRouteArgs>(name);
-}
-
-class ChatsListRouteArgs {
-  const ChatsListRouteArgs({this.key});
-
-  final Key? key;
-
-  @override
-  String toString() {
-    return 'ChatsListRouteArgs{key: $key}';
-  }
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
@@ -146,6 +135,20 @@ class SearchUsersRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'SearchUsersRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [SplashScreen]
+class SplashRoute extends PageRouteInfo<void> {
+  const SplashRoute({List<PageRouteInfo>? children})
+      : super(
+          SplashRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'SplashRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
