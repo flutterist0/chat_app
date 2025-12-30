@@ -6,6 +6,7 @@ import 'package:test_app/feature/auth/presentation/auth_gate.dart';
 import 'package:test_app/feature/auth/presentation/login_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
 import 'package:test_app/firebase_options.dart';
+import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/shared/services/notification_service.dart';
 @pragma('vm:entry-point')
@@ -15,7 +16,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  setupLocator();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
