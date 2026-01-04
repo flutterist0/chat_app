@@ -1,68 +1,52 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/data/models/message.dart';
+import 'package:test_app/feature/chat/logic/bloc/chat/chat_bloc.dart';
 import 'package:test_app/feature/chat/presentation/widgets/message_bubble.dart';
+import 'package:test_app/shared/injection_container.dart';
 
 @RoutePage()
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatelessWidget {
   final Chat chat;
 
-  ChatScreen({required this.chat});
+  const ChatScreen({super.key, required this.chat});
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<ChatBloc>()..add(ChatStarted(chat)),
+      child: _ChatView(chat: chat),
+    );
+  }
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatView extends StatefulWidget {
+  final Chat chat;
+  const _ChatView({required this.chat});
+
+  @override
+  _ChatViewState createState() => _ChatViewState();
+}
+
+class _ChatViewState extends State<_ChatView> {
   final TextEditingController _messageController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FocusNode _focusNode = FocusNode();
-
-  late String currentUserId;
-  late String receiverId;
-  late String chatId;
   final ScrollController _scrollController = ScrollController();
-
+  
   bool _isEmojiVisible = false;
-  final ImagePicker _picker = ImagePicker();
-  bool _isUploading = false;
-
-  Message? replyMessage;
 
   @override
   void initState() {
     super.initState();
-    currentUserId = _auth.currentUser!.uid;
-    receiverId = widget.chat.id;
-
-    List<String> ids = [currentUserId, receiverId];
-    ids.sort();
-    chatId = ids.join("_");
-
-    _resetUnreadCount();
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) setState(() => _isEmojiVisible = false);
     });
-  }
-
-  void _resetUnreadCount() async {
-    try {
-      await _firestore.collection('chats').doc(chatId).update({
-        'unreadCounts.$currentUserId': 0,
-      });
-    } catch (e) {
-      print("Sıfırlama xətası: $e");
-    }
   }
 
   void _toggleEmojiKeyboard() {
@@ -79,8 +63,9 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() => _isEmojiVisible = false);
       return false;
     }
-    if (replyMessage != null) {
-      _cancelReply();
+    final currentBlocState = context.read<ChatBloc>().state;
+    if (currentBlocState.replyMessage != null) {
+      context.read<ChatBloc>().add(CancelReply());
       return false;
     }
     return true;
@@ -90,163 +75,14 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.text = _messageController.text + emoji.emoji;
   }
 
-  void _onSwipeToReply(Message message) {
-    setState(() {
-      replyMessage = message;
-    });
-    _focusNode.requestFocus();
-  }
-
-  void _cancelReply() {
-    setState(() {
-      replyMessage = null;
-    });
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 20,
-        maxWidth: 600,
-      );
-      if (pickedFile != null) {
-        File imageFile = File(pickedFile.path);
-        _convertAndSendBase64(imageFile);
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
-  Future<void> _convertAndSendBase64(File imageFile) async {
-    setState(() => _isUploading = true);
-    try {
-      List<int> imageBytes = await imageFile.readAsBytes();
-      String base64String = base64Encode(imageBytes);
-
-      await _sendMessageToFirestore(
-        text: '',
-        imageBase64: base64String,
-        type: 'image',
-      );
-
-      _cancelReply();
-      _scrollToBottom();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xəta: $e")));
-    } finally {
-      setState(() => _isUploading = false);
-    }
-  }
-
-  void _sendMessage() async {
-    String text = _messageController.text.trim();
-    if (text.isEmpty) return;
-    _messageController.clear();
-
-    await _sendMessageToFirestore(text: text, type: 'text');
-
-    _cancelReply();
-    _scrollToBottom();
-  }
-
-  Future<void> _sendMessageToFirestore({
-    required String text,
-    String? imageBase64,
-    required String type,
-  }) async {
-    Map<String, dynamic> messageData = {
-      'senderId': currentUserId,
-      'receiverId': receiverId,
-      'text': text,
-      'type': type,
-      'timestamp': FieldValue.serverTimestamp(),
-    };
-
-    if (imageBase64 != null) {
-      messageData['imageBase64'] = imageBase64;
-    }
-
-    if (replyMessage != null) {
-      String replyPreview = replyMessage!.text.length > 50 && !replyMessage!.text.contains(' ')
-          ? "📷 Şəkil"
-          : replyMessage!.text;
-
-      messageData['replyText'] = replyPreview;
-      messageData['replySender'] = replyMessage!.isSentByMe ? "Sən" : widget.chat.name;
-    }
-
-    await _firestore
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .add(messageData);
-
-    String lastMsg = type == 'image' ? '📷 Şəkil' : text;
-    _updateChatLastMessage(lastMsg);
-  }
-
-  void _updateChatLastMessage(String lastMsg) async {
-    await _firestore.collection('chats').doc(chatId).set({
-      'participants': [currentUserId, receiverId],
-      'lastMessage': lastMsg,
-      'lastMessageTime': FieldValue.serverTimestamp(),
-      'unreadCounts': {receiverId: FieldValue.increment(1)}
-    }, SetOptions(merge: true));
-  }
-
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         0.0,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     }
-  }
-
-
-  bool _isSameDay(Timestamp t1, Timestamp t2) {
-    DateTime d1 = t1.toDate();
-    DateTime d2 = t2.toDate();
-    return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
-  }
-
-  String _getDateLabel(DateTime date) {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-    DateTime yesterday = today.subtract(Duration(days: 1));
-    DateTime dateToCheck = DateTime(date.year, date.month, date.day);
-
-    if (dateToCheck == today) return "Bu gün";
-    if (dateToCheck == yesterday) return "Dünən";
-    return "${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}";
-  }
-
-  String _formatTime(Timestamp? timestamp) {
-    if (timestamp == null) return '';
-    DateTime date = timestamp.toDate();
-    return "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
-  }
-
-  Widget _buildDateHeader(Timestamp timestamp) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 16),
-      child: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            _getDateLabel(timestamp.toDate()),
-            style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -256,9 +92,8 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Scaffold(
         body: Column(
           children: [
-            // --- HEADER ---
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)]),
               ),
               child: SafeArea(
@@ -267,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.pop(context)),
                       Container(
                         width: 40.w,
@@ -279,7 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 widget.chat.name.isNotEmpty
                                     ? widget.chat.name.substring(0, 1).toUpperCase()
                                     : '?',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white, fontWeight: FontWeight.bold))),
                       ),
                       SizedBox(width: 12.w),
@@ -294,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     fontWeight: FontWeight.w600),
                                 overflow: TextOverflow.ellipsis),
                             Text(widget.chat.isOnline ? 'Onlayn' : 'Oflayn',
-                                style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                style: const TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                       ),
@@ -303,28 +138,28 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-            if (_isUploading) LinearProgressIndicator(backgroundColor: Colors.blue[100]),
+            
+            BlocBuilder<ChatBloc, ChatState>(
+              buildWhen: (previous, current) => previous.isUploading != current.isUploading,
+              builder: (context, state) {
+                 if (state.isUploading) {
+                   return LinearProgressIndicator(backgroundColor: Colors.blue[100]);
+                 }
+                 return const SizedBox.shrink();
+              },
+            ),
 
             Expanded(
               child: Container(
                 color: Colors.grey[100],
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: _firestore
-                      .collection('chats')
-                      .doc(chatId)
-                      .collection('messages')
-                      .orderBy('timestamp', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) return Center(child: Text('Xəta'));
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return Center(child: CircularProgressIndicator());
-
-                    var docs = snapshot.data!.docs;
-
-
-                    if (docs.isEmpty) {
-                      return Center(
+                child: BlocBuilder<ChatBloc, ChatState>(
+                  builder: (context, state) {
+                    if (state.status == ChatStatus.loading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state.status == ChatStatus.failure) {
+                      return Center(child: Text('Xəta: ${state.errorMessage}'));
+                    } else if (state.messages.isEmpty) {
+                      return const Center(
                           child: Text('Hələ mesaj yoxdur.',
                               style: TextStyle(color: Colors.grey)));
                     }
@@ -332,47 +167,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     return ListView.builder(
                       reverse: true,
                       controller: _scrollController,
-                      padding: EdgeInsets.all(16),
-                      itemCount: docs.length,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: state.messages.length,
                       itemBuilder: (context, index) {
-                        var data = docs[index].data() as Map<String, dynamic>;
+                        
+                        final message = state.messages[index];
 
-                        bool showDateHeader = false;
-                        Timestamp currentTs = data['timestamp'] ?? Timestamp.now();
-
-                        if (index == docs.length - 1) {
-                          showDateHeader = true;
-                        } else {
-                          var prevData = docs[index + 1].data() as Map<String, dynamic>;
-                          Timestamp prevTs = prevData['timestamp'] ?? Timestamp.now();
-
-                          showDateHeader = !_isSameDay(currentTs, prevTs);
-                        }
-
-                        bool isMe = data['senderId'] == currentUserId;
-                        String type = data['type'] ?? 'text';
-                        String content =
-                        type == 'image' ? (data['imageBase64'] ?? '') : (data['text'] ?? '');
-
-                        String? replyTxt = data['replyText'];
-                        String? replySndr = data['replySender'];
-
-                        Message message = Message(
-                          text: content,
-                          isSentByMe: isMe,
-                          time: _formatTime(data['timestamp']),
-                          replyText: replyTxt,
-                          replySender: replySndr,
-                        );
-
-                        return Column(
-                          children: [
-                            if (showDateHeader) _buildDateHeader(currentTs),
-                            MessageBubble(
-                              message: message,
-                              onSwipe: _onSwipeToReply,
-                            ),
-                          ],
+                        return MessageBubble(
+                          message: message,
+                          onSwipe: (msg) {
+                             context.read<ChatBloc>().add(SetReplyMessage(msg));
+                             _focusNode.requestFocus();
+                          },
                         );
                       },
                     );
@@ -381,7 +187,6 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
 
-            // --- INPUT AREA ---
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -390,45 +195,53 @@ class _ChatScreenState extends State<ChatScreen> {
               child: SafeArea(
                 child: Column(
                   children: [
-                    if (replyMessage != null)
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        color: Colors.grey[200],
-                        child: Row(
-                          children: [
-                            Icon(Icons.reply, color: Color(0xFF2563EB)),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Replying to ${replyMessage!.isSentByMe ? 'Özünə' : widget.chat.name}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
-                                  ),
-                                  Text(
-                                    replyMessage!.text.length > 50 &&
-                                        !replyMessage!.text.contains(' ')
-                                        ? "📷 Şəkil"
-                                        : replyMessage!.text,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(color: Colors.black54),
-                                  ),
-                                ],
+                    BlocBuilder<ChatBloc, ChatState>(
+                      buildWhen: (previous, current) => previous.replyMessage != current.replyMessage,
+                      builder: (context, state) {
+                        if (state.replyMessage == null) return const SizedBox.shrink();
+
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          color: Colors.grey[200],
+                          child: Row(
+                            children: [
+                              const Icon(Icons.reply, color: Color(0xFF2563EB)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Replying to ${state.replyMessage!.isSentByMe ? 'Özünə' : widget.chat.name}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                                    ),
+                                    Text(
+                                      state.replyMessage!.text.length > 50 &&
+                                              !state.replyMessage!.text.contains(' ')
+                                          ? "📷 Şəkil"
+                                          : state.replyMessage!.text,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(color: Colors.black54),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.close, color: Colors.grey),
-                              onPressed: _cancelReply,
-                            )
-                          ],
-                        ),
-                      ),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.grey),
+                                onPressed: () {
+                                  context.read<ChatBloc>().add(CancelReply());
+                                },
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
 
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       child: Row(
                         children: [
                           IconButton(
@@ -441,11 +254,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           IconButton(
                             icon: Icon(Icons.image_outlined, color: Colors.grey[600]),
-                            onPressed: () => _pickImage(ImageSource.gallery),
+                            onPressed: () => context.read<ChatBloc>().add(SendImage(ImageSource.gallery)),
                           ),
                           IconButton(
                             icon: Icon(Icons.camera_alt_outlined, color: Colors.grey[600]),
-                            onPressed: () => _pickImage(ImageSource.camera),
+                            onPressed: () => context.read<ChatBloc>().add(SendImage(ImageSource.camera)),
                           ),
                           Expanded(
                             child: Container(
@@ -455,7 +268,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: TextField(
                                 focusNode: _focusNode,
                                 controller: _messageController,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                     hintText: 'Mesaj yazın...',
                                     border: InputBorder.none,
                                     contentPadding:
@@ -463,13 +276,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Container(
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Color(0xFF2563EB), shape: BoxShape.circle),
                             child: IconButton(
-                              icon: Icon(Icons.send, color: Colors.white, size: 20),
-                              onPressed: _sendMessage,
+                              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                              onPressed: () {
+                                context.read<ChatBloc>().add(SendMessage(_messageController.text.trim()));
+                                _messageController.clear();
+                                _scrollToBottom();
+                              },
                             ),
                           ),
                         ],
@@ -485,7 +302,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 height: 250.h,
                 child: EmojiPicker(
                   onEmojiSelected: (category, emoji) => _onEmojiSelected(category, emoji),
-                  config: Config(),
+                  config: const Config(),
                 ),
               ),
           ],

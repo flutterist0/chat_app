@@ -1,28 +1,36 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/data/models/user_profile.dart';
-import 'package:test_app/feature/chat/presentation/screens/chat_screen.dart';
+import 'package:test_app/feature/chat/logic/bloc/search_user/search_user_bloc.dart';
 import 'package:test_app/feature/chat/presentation/widgets/user_list_item.dart';
+import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 
 @RoutePage()
-class SearchUsersScreen extends StatefulWidget {
+class SearchUsersScreen extends StatelessWidget {
+  const SearchUsersScreen({super.key});
+
   @override
-  _SearchUsersScreenState createState() => _SearchUsersScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<SearchUserBloc>()..add(LoadUsers()),
+      child: const _SearchUsersView(),
+    );
+  }
 }
 
-class _SearchUsersScreenState extends State<SearchUsersScreen> {
+class _SearchUsersView extends StatefulWidget {
+  const _SearchUsersView();
+
+  @override
+  State<_SearchUsersView> createState() => _SearchUsersViewState();
+}
+
+class _SearchUsersViewState extends State<_SearchUsersView> {
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  final Stream<QuerySnapshot> _usersStream =
-  FirebaseFirestore.instance.collection('users').snapshots();
-
-  final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void dispose() {
@@ -30,13 +38,7 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
     super.dispose();
   }
 
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query.toLowerCase();
-    });
-  }
-
-  void _startChat(UserProfile user) {
+  void _startChat(BuildContext context, UserProfile user) {
     Chat newChat = Chat(
       id: user.id,
       name: user.name,
@@ -54,7 +56,6 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // Header Hissəsi
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -93,19 +94,22 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                       ),
                       child: TextField(
                         controller: _searchController,
-                        onChanged: _onSearchChanged,
+                        onChanged: (query) {
+                          context.read<SearchUserBloc>().add(SearchQueryChanged(query));
+                        },
                         decoration: InputDecoration(
                           hintText: 'İstifadəçi axtar...',
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                            icon: Icon(Icons.clear, color: Colors.grey[600]),
-                            onPressed: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                          )
+                                  icon: Icon(Icons.clear, color: Colors.grey[600]),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    context.read<SearchUserBloc>().add(SearchQueryChanged(''));
+                                    setState(() {}); 
+                                  },
+                                )
                               : null,
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
@@ -122,33 +126,13 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
           ),
 
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _usersStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Center(child: Text('Xəta baş verdi'));
-                }
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: BlocBuilder<SearchUserBloc, SearchUserState>(
+              builder: (context, state) {
+                if (state.status == SearchStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
-                }
-
-                var docs = snapshot.data!.docs;
-
-                var filteredDocs = docs.where((doc) {
-                  var data = doc.data() as Map<String, dynamic>;
-                  String uid = doc.id;
-
-                  if (uid == currentUserId) return false;
-
-                  String name = (data['name'] ?? '').toString().toLowerCase();
-                  String email = (data['email'] ?? '').toString().toLowerCase();
-
-                  if (_searchQuery.isEmpty) return true;
-                  return name.contains(_searchQuery) || email.contains(_searchQuery);
-                }).toList();
-
-                if (filteredDocs.isEmpty) {
+                } else if (state.status == SearchStatus.failure) {
+                  return Center(child: Text('Xəta: ${state.errorMessage}'));
+                } else if (state.filteredUsers.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -160,7 +144,9 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'İstifadəçi tapılmadı',
+                          state.allUsers.isEmpty 
+                              ? 'Hələ heç kim yoxdur' 
+                              : 'İstifadəçi tapılmadı',
                           style: TextStyle(
                             fontSize: 18.sp,
                             color: Colors.grey[600],
@@ -173,20 +159,12 @@ class _SearchUsersScreenState extends State<SearchUsersScreen> {
                 }
 
                 return ListView.builder(
-                  itemCount: filteredDocs.length,
+                  itemCount: state.filteredUsers.length,
                   itemBuilder: (context, index) {
-                    var data = filteredDocs[index].data() as Map<String, dynamic>;
-
-                    UserProfile user = UserProfile(
-                      id: filteredDocs[index].id,
-                      name: data['name'] ?? 'Adsız',
-                      email: data['email'] ?? '',
-                      isOnline: data['isOnline'] ?? false,
-                    );
-
+                    final user = state.filteredUsers[index];
                     return UserListItem(
                       user: user,
-                      onTap: () => _startChat(user),
+                      onTap: () => _startChat(context, user),
                     );
                   },
                 );

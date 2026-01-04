@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/feature/auth/presentation/register_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
+import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
-import '../data/auth_service.dart';
+import '../service/auth_service.dart';
 // Bloc fayllarını import etməyi unutmayın (yuxarıda yaratdığımız fayllar)
-import '../logic/login/bloc/login_bloc.dart';
+import '../logic/bloc/login/login_bloc.dart';
 
 @RoutePage()
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // 1. Bloc-u yaradırıq və ağaca (tree) əlavə edirik
     return BlocProvider(
-      create: (context) => LoginBloc(AuthService()),
+      create: (context) => getIt<LoginBloc>(),
       child: _LoginView(),
     );
   }
