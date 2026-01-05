@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
+
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/data/models/message.dart';
 
@@ -17,7 +18,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
   final ImagePicker _picker;
-  
+
   StreamSubscription? _messagesSubscription;
   late String currentUserId;
   late String chatId;
@@ -31,12 +32,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendImage>(_onSendImage);
     on<SetReplyMessage>((event, emit) => emit(state.copyWith(replyMessage: event.message)));
     on<CancelReply>((event, emit) => emit(state.copyWith(clearReply: true)));
+    on<DeleteMessage>(_onDeleteMessage);
     on<ChatErrorOccurred>((event, emit) => emit(state.copyWith(status: ChatStatus.failure, errorMessage: event.error)));
   }
 
   void _onChatStarted(ChatStarted event, Emitter<ChatState> emit) {
     emit(state.copyWith(status: ChatStatus.loading));
-    
+
     currentUserId = _auth.currentUser!.uid;
     receiverId = event.chat.id;
     receiverName = event.chat.name;
@@ -55,14 +57,57 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .listen((snapshot) {
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        if (data['receiverId'] == currentUserId && data['isRead'] == false) {
+          _firestore
+              .collection('chats')
+              .doc(chatId)
+              .collection('messages')
+              .doc(doc.id)
+              .update({'isRead': true});
+        }
+      }
+
       final messages = snapshot.docs.map((doc) {
         final data = doc.data();
-        return _mapDocumentToMessage(data);
-      }).toList();
+        return _mapDocumentToMessage(doc.id, data);
+      })
+          .where((msg) {
+        return msg != null;
+      })
+          .cast<Message>()
+          .toList();
+
       add(ChatUpdated(messages));
     }, onError: (e) {
       add(ChatErrorOccurred(e.toString()));
     });
+  }
+
+  Future<void> _onDeleteMessage(DeleteMessage event, Emitter<ChatState> emit) async {
+    try {
+      if (event.forEveryone) {
+        await _firestore
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .doc(event.message.id)
+            .delete();
+      } else {
+        await _firestore
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .doc(event.message.id)
+            .update({
+          'deletedBy': FieldValue.arrayUnion([currentUserId])
+        });
+      }
+    } catch (e) {
+      emit(state.copyWith(errorMessage: "Silinmə xətası: $e"));
+    }
   }
 
   void _onChatUpdated(ChatUpdated event, Emitter<ChatState> emit) {
@@ -72,10 +117,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ));
   }
 
+
+
   Future<void> _onSendMessage(SendMessage event, Emitter<ChatState> emit) async {
     if (event.text.isEmpty) return;
     await _uploadMessageToFirestore(text: event.text, type: 'text');
-    emit(state.copyWith(clearReply: true)); 
+    emit(state.copyWith(clearReply: true));
   }
 
   Future<void> _onSendImage(SendImage event, Emitter<ChatState> emit) async {
@@ -88,7 +135,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       if (pickedFile != null) {
         emit(state.copyWith(isUploading: true));
-        
+
         File imageFile = File(pickedFile.path);
         List<int> imageBytes = await imageFile.readAsBytes();
         String base64String = base64Encode(imageBytes);
@@ -106,6 +153,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
+
+
   Future<void> _uploadMessageToFirestore({
     required String text,
     String? imageBase64,
@@ -117,29 +166,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       'text': text,
       'type': type,
       'timestamp': FieldValue.serverTimestamp(),
+      'isRead': false,
+      'deletedBy': [],
     };
 
-    if (imageBase64 != null) {
-      messageData['imageBase64'] = imageBase64;
-    }
+    if (imageBase64 != null) messageData['imageBase64'] = imageBase64;
 
     if (state.replyMessage != null) {
       final reply = state.replyMessage!;
-      String replyPreview = reply.text.length > 50 && !reply.text.contains(' ')
-          ? "📷 Şəkil"
-          : reply.text;
+      String replyPreview = reply.text.length > 50 && !reply.text.contains(' ') ? "📷 Şəkil" : reply.text;
 
       messageData['replyText'] = replyPreview;
       messageData['replySender'] = reply.isSentByMe ? "Sən" : receiverName;
     }
 
-    await _firestore
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .add(messageData);
+    await _firestore.collection('chats').doc(chatId).collection('messages').add(messageData);
 
-    String lastMsg = type == 'image' ? '📷 Şəkil' : text;
+    String lastMsg = type == 'image' ? '📷 Şəkil' : (type == 'audio' ? '🎤 Səsli mesaj' : text);
     _updateChatLastMessage(lastMsg);
   }
 
@@ -157,21 +200,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       await _firestore.collection('chats').doc(chatId).update({
         'unreadCounts.$currentUserId': 0,
       });
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
-  Message _mapDocumentToMessage(Map<String, dynamic> data) {
+
+  Message? _mapDocumentToMessage(String docId, Map<String, dynamic> data) {
+    List<dynamic> deletedBy = data['deletedBy'] ?? [];
+    if (deletedBy.contains(currentUserId)) {
+      return null;
+    }
+
     bool isMe = data['senderId'] == currentUserId;
     String type = data['type'] ?? 'text';
-    String content = type == 'image' ? (data['imageBase64'] ?? '') : (data['text'] ?? '');
+    String content = type == 'image' ? (data['imageBase64'] ?? '') : (type == 'audio' ? (data['audioBase64'] ?? '') : (data['text'] ?? ''));
 
     return Message(
+      id: docId,
       text: content,
       isSentByMe: isMe,
       time: _formatTime(data['timestamp']),
       replyText: data['replyText'],
       replySender: data['replySender'],
+      type: type,
+      isRead: data['isRead'] ?? false,
     );
   }
 

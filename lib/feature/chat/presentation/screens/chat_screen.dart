@@ -38,7 +38,7 @@ class _ChatViewState extends State<_ChatView> {
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  
+
   bool _isEmojiVisible = false;
 
   @override
@@ -48,7 +48,54 @@ class _ChatViewState extends State<_ChatView> {
       if (_focusNode.hasFocus) setState(() => _isEmojiVisible = false);
     });
   }
+  void _showDeleteOptions(BuildContext context, Message message) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Mesajı silmək istəyirsiniz?",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 20),
 
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.blue),
+                title: const Text("Mənim üçün sil"),
+                onTap: () {
+                  context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: false));
+                  Navigator.pop(bottomSheetContext);
+                },
+              ),
+
+              if (message.isSentByMe)
+                ListTile(
+                  leading: const Icon(Icons.delete_forever, color: Colors.red),
+                  title: const Text("Hər kəs üçün sil", style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: true));
+                    Navigator.pop(bottomSheetContext);
+                  },
+                ),
+
+              ListTile(
+                leading: const Icon(Icons.close),
+                title: const Text("Ləğv et"),
+                onTap: () => Navigator.pop(bottomSheetContext),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   void _toggleEmojiKeyboard() {
     if (_isEmojiVisible) {
       _focusNode.requestFocus();
@@ -138,7 +185,7 @@ class _ChatViewState extends State<_ChatView> {
                 ),
               ),
             ),
-            
+
             BlocBuilder<ChatBloc, ChatState>(
               buildWhen: (previous, current) => previous.isUploading != current.isUploading,
               builder: (context, state) {
@@ -170,7 +217,7 @@ class _ChatViewState extends State<_ChatView> {
                       padding: const EdgeInsets.all(16),
                       itemCount: state.messages.length,
                       itemBuilder: (context, index) {
-                        
+
                         final message = state.messages[index];
 
                         return MessageBubble(
@@ -178,6 +225,9 @@ class _ChatViewState extends State<_ChatView> {
                           onSwipe: (msg) {
                              context.read<ChatBloc>().add(SetReplyMessage(msg));
                              _focusNode.requestFocus();
+                          },
+                          onLongPress: (msg) {
+                            _showDeleteOptions(context, msg);
                           },
                         );
                       },

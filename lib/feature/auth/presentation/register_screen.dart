@@ -214,7 +214,6 @@ class _RegisterViewState extends State<_RegisterView> {
                             ? null
                             : () {
                                 if (_formKey.currentState!.validate()) {
-                                  // Event-i Bloc-a göndəririk
                                   context.read<RegisterBloc>().add(
                                         RegisterSubmitted(
                                           fullName: _nameController.text.trim(),

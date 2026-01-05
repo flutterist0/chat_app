@@ -6,7 +6,6 @@ import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import '../service/auth_service.dart';
-// Bloc fayllarını import etməyi unutmayın (yuxarıda yaratdığımız fayllar)
 import '../logic/bloc/login/login_bloc.dart';
 
 @RoutePage()
@@ -35,14 +34,11 @@ class _LoginViewState extends State<_LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 2. BlocConsumer həm dinləyir (Listener), həm də çəkir (Builder)
       body: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
-            // Uğurlu giriş -> Yönləndirmə
             context.router.push(ChatsListRoute());
           } else if (state is LoginFailure) {
-            // Xəta -> SnackBar göstər
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -52,7 +48,6 @@ class _LoginViewState extends State<_LoginView> {
           }
         },
         builder: (context, state) {
-          // Loading vəziyyətini yoxlayırıq
           final bool isLoading = state is LoginLoading;
 
           return SafeArea(
@@ -103,7 +98,7 @@ class _LoginViewState extends State<_LoginView> {
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        enabled: !isLoading, // Loading gedərkən inputu dondururuq
+                        enabled: !isLoading, 
                         decoration: InputDecoration(
                           labelText: 'Email',
                           hintText: 'email@example.com',
@@ -148,13 +143,11 @@ class _LoginViewState extends State<_LoginView> {
                         },
                       ),
                       SizedBox(height: 24),
-                      // Daxil ol düyməsi
                       ElevatedButton(
                         onPressed: isLoading
                             ? null
                             : () {
                           if (_formKey.currentState!.validate()) {
-                            // 3. Bloc-a EVENT göndəririk
                             context.read<LoginBloc>().add(
                               LoginSubmitted(
                                 email: _emailController.text.trim(),
@@ -189,7 +182,6 @@ class _LoginViewState extends State<_LoginView> {
                         ),
                       ),
                       SizedBox(height: 24),
-                      // Qeydiyyat linki
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

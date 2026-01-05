@@ -32,6 +32,11 @@ class SetReplyMessage extends ChatEvent {
 class CancelReply extends ChatEvent {
   CancelReply();
 }
+class DeleteMessage extends ChatEvent {
+  final Message message;
+  final bool forEveryone;
+  DeleteMessage(this.message, {required this.forEveryone});
+}
 
 class ChatErrorOccurred extends ChatEvent {
   final String error;
