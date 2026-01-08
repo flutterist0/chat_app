@@ -19,7 +19,10 @@ abstract class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<ChatRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: ChatScreen(chat: args.chat),
+        child: ChatScreen(
+          key: args.key,
+          chat: args.chat,
+        ),
       );
     },
     ChatsListRoute.name: (routeData) {
@@ -34,6 +37,12 @@ abstract class _$AppRouter extends RootStackRouter {
         child: LoginScreen(),
       );
     },
+    NotificationRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const NotificationScreen(),
+      );
+    },
     RegisterRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -43,7 +52,7 @@ abstract class _$AppRouter extends RootStackRouter {
     SearchUsersRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: SearchUsersScreen(),
+        child: const SearchUsersScreen(),
       );
     },
     SplashRoute.name: (routeData) {
@@ -59,11 +68,15 @@ abstract class _$AppRouter extends RootStackRouter {
 /// [ChatScreen]
 class ChatRoute extends PageRouteInfo<ChatRouteArgs> {
   ChatRoute({
+    Key? key,
     required Chat chat,
     List<PageRouteInfo>? children,
   }) : super(
           ChatRoute.name,
-          args: ChatRouteArgs(chat: chat),
+          args: ChatRouteArgs(
+            key: key,
+            chat: chat,
+          ),
           initialChildren: children,
         );
 
@@ -73,13 +86,18 @@ class ChatRoute extends PageRouteInfo<ChatRouteArgs> {
 }
 
 class ChatRouteArgs {
-  const ChatRouteArgs({required this.chat});
+  const ChatRouteArgs({
+    this.key,
+    required this.chat,
+  });
+
+  final Key? key;
 
   final Chat chat;
 
   @override
   String toString() {
-    return 'ChatRouteArgs{chat: $chat}';
+    return 'ChatRouteArgs{key: $key, chat: $chat}';
   }
 }
 
@@ -107,6 +125,20 @@ class LoginRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'LoginRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [NotificationScreen]
+class NotificationRoute extends PageRouteInfo<void> {
+  const NotificationRoute({List<PageRouteInfo>? children})
+      : super(
+          NotificationRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'NotificationRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

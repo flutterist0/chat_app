@@ -5,9 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/data/models/user_profile.dart';
 import 'package:test_app/feature/chat/logic/bloc/search_user/search_user_bloc.dart';
+import 'package:test_app/feature/chat/presentation/widgets/search_user_header.dart';
 import 'package:test_app/feature/chat/presentation/widgets/user_list_item.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class SearchUsersScreen extends StatelessWidget {
@@ -42,8 +45,8 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
     Chat newChat = Chat(
       id: user.id,
       name: user.name,
-      lastMessage: 'Yeni söhbət',
-      time: 'İndi',
+      lastMessage: AppStrings.newChat,
+      time: AppStrings.now,
       unreadCount: 0,
       isOnline: user.isOnline,
     );
@@ -56,73 +59,16 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(16.sp),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Yeni Mesaj',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.sp, 0.sp, 16.sp, 16.sp),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25.r),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (query) {
-                          context.read<SearchUserBloc>().add(SearchQueryChanged(query));
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'İstifadəçi axtar...',
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: Icon(Icons.clear, color: Colors.grey[600]),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    context.read<SearchUserBloc>().add(SearchQueryChanged(''));
-                                    setState(() {}); 
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20.sp,
-                            vertical: 15.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          SearchUserHeader(
+            searchController: _searchController,
+            onSearchChanged: (query) {
+              context.read<SearchUserBloc>().add(SearchQueryChanged(query));
+            },
+            onClearPressed: () {
+              _searchController.clear();
+              context.read<SearchUserBloc>().add(SearchQueryChanged(''));
+              setState(() {});
+            },
           ),
 
           Expanded(
@@ -140,16 +86,16 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
                         Icon(
                           Icons.person_search,
                           size: 80.sp,
-                          color: Colors.grey[400],
+                          color: AppStyles.grey400,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           state.allUsers.isEmpty 
-                              ? 'Hələ heç kim yoxdur' 
-                              : 'İstifadəçi tapılmadı',
+                              ? AppStrings.noUsersYet 
+                              : AppStrings.noUsersFound,
                           style: TextStyle(
                             fontSize: 18.sp,
-                            color: Colors.grey[600],
+                            color: AppStyles.grey600,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

@@ -4,6 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/feature/auth/logic/bloc/register/register_bloc.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:test_app/feature/auth/presentation/widgets/auth_header.dart';
+import 'package:test_app/feature/auth/presentation/widgets/auth_text_field.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class RegisterScreen extends StatelessWidget {
@@ -26,10 +31,9 @@ class _RegisterViewState extends State<_RegisterView> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
-  bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
+
+  final _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,7 @@ class _RegisterViewState extends State<_RegisterView> {
             
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text("Qeydiyyat uğurla tamamlandı!"),
+                content: Text(AppStrings.registerSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -60,13 +64,13 @@ class _RegisterViewState extends State<_RegisterView> {
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.all(AppStyles.paddingDefault),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      SizedBox(height: 40),
+                      SizedBox(height: 40.h),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: IconButton(
@@ -74,140 +78,71 @@ class _RegisterViewState extends State<_RegisterView> {
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF3B82F6), Color(0xFF9333EA)],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.person_add_rounded,
-                          size: 40,
-                          color: Colors.white,
-                        ),
+                      SizedBox(height: 20.h),
+                      AuthHeader(
+                        icon: Icons.person_add_rounded,
+                        title: AppStrings.createAccount,
+                        subTitle: AppStrings.registerAndChat,
                       ),
-                      SizedBox(height: 24),
-                      Text(
-                        'Hesab yaradın',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[900],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Qeydiyyatdan keçin və söhbətə başlayın',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      SizedBox(height: 32),
+                      SizedBox(height: 32.h),
                       
-                      TextFormField(
+                      AuthTextField(
                         controller: _nameController,
+                        label: AppStrings.fullName,
+                        hint: AppStrings.enterName,
+                        prefixIcon: Icons.person_outlined,
                         enabled: !isLoading,
-                        decoration: InputDecoration(
-                          labelText: 'Ad Soyad',
-                          hintText: 'Adınızı daxil edin',
-                          prefixIcon: Icon(Icons.person_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Ad daxil edin';
+                          if (value == null || value.isEmpty) return AppStrings.enterNameError;
                           return null;
                         },
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       
-                      TextFormField(
+                      AuthTextField(
                         controller: _emailController,
+                        label: AppStrings.email,
+                        hint: AppStrings.emailPlaceholder,
+                        prefixIcon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
                         enabled: !isLoading,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'email@example.com',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Email daxil edin';
-                          if (!value.contains('@')) return 'Düzgün email daxil edin';
+                          if (value == null || value.isEmpty) return AppStrings.enterEmail;
+                          if (!value.contains('@')) return AppStrings.correctValidEmail;
                           return null;
                         },
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       
-                      TextFormField(
+                      AuthTextField(
                         controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
+                        label: AppStrings.password,
+                        hint: AppStrings.passwordHintText,
+                        prefixIcon: Icons.lock_outlined,
+                        isPassword: true,
                         enabled: !isLoading,
-                        decoration: InputDecoration(
-                          labelText: 'Şifrə',
-                          hintText: '••••••••',
-                          prefixIcon: Icon(Icons.lock_outlined),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Şifrə daxil edin';
-                          if (value.length < 6) return 'Şifrə ən azı 6 simvol olmalıdır';
+                          if (value == null || value.isEmpty) return AppStrings.enterPassword;
+                          if (value.length < 6) return AppStrings.passwordLeastCharacter;
                           return null;
                         },
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       
-                      TextFormField(
+                      AuthTextField(
                         controller: _confirmPasswordController,
-                        obscureText: !_isConfirmPasswordVisible,
+                        label: AppStrings.confirmPassword,
+                        hint: AppStrings.passwordHintText,
+                        prefixIcon: Icons.lock_outlined,
+                        isPassword: true,
                         enabled: !isLoading,
-                        decoration: InputDecoration(
-                          labelText: 'Şifrəni təsdiq edin',
-                          hintText: '••••••••',
-                          prefixIcon: Icon(Icons.lock_outlined),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                              });
-                            },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Şifrəni təsdiq edin';
-                          if (value != _passwordController.text) return 'Şifrələr uyğun gəlmir';
+                          if (value == null || value.isEmpty) return AppStrings.confirmPasswordError;
+                          if (value != _passwordController.text) return AppStrings.passwordMismatchError;
                           return null;
                         },
                       ),
-                      SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       
                       ElevatedButton(
                         onPressed: isLoading
@@ -223,49 +158,35 @@ class _RegisterViewState extends State<_RegisterView> {
                                       );
                                 }
                               },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF2563EB),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
-                        ),
+                        style: AppStyles.primaryButton,
                         child: isLoading
                             ? SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppStyles.white),
                                 ),
                               )
                             : Text(
-                                'Qeydiyyatdan keç',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                AppStrings.registerAction,
+                                  style: AppStyles.buttonText,
                               ),
                       ),
-                      SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Artıq hesabınız var? ',
-                            style: TextStyle(color: Colors.grey[600]),
+                            AppStrings.alreadyHaveAccount,
+                            style: AppStyles.bodyText,
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Text(
-                              'Daxil olun',
-                              style: TextStyle(
-                                color: Color(0xFF2563EB),
-                                fontWeight: FontWeight.w600,
-                              ),
+                              AppStrings.loginAction,
+                              style: AppStyles.linkText,
                             ),
                           ),
                         ],

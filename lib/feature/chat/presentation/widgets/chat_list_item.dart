@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
 
 class ChatListItem extends StatelessWidget {
   final Chat chat;
@@ -15,27 +16,21 @@ class ChatListItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+          border: Border(bottom: BorderSide(color: AppStyles.grey200)),
         ),
         child: Row(
           children: [
-            // Avatar
             Stack(
               children: [
                 Container(
                   width: 56.w,
                   height: 56.h,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF3B82F6), Color(0xFF9333EA)],
-                    ),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: AppStyles.circleGradientDecoration,
                   child: Center(
                     child: Text(
                       chat.name.split(' ').map((e) => e[0]).take(2).join(),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppStyles.white,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -49,17 +44,12 @@ class ChatListItem extends StatelessWidget {
                     child: Container(
                       width: 16.w,
                       height: 16.h,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2.w),
-                      ),
+                      decoration: AppStyles.onlineIndicatorDecoration,
                     ),
                   ),
               ],
             ),
             SizedBox(width: 12.w),
-            // Məlumat
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,14 +62,14 @@ class ChatListItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[900],
+                          color: AppStyles.grey900,
                         ),
                       ),
                       Text(
                         chat.time,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Colors.grey[600],
+                          color: AppStyles.grey600,
                         ),
                       ),
                     ],
@@ -91,25 +81,21 @@ class ChatListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14.sp,
-                      color: Colors.grey[600],
+                      color: AppStyles.grey600,
                     ),
                   ),
                 ],
               ),
             ),
-            // Oxunmamış mesajlar
             if (chat.unreadCount > 0) ...[
               SizedBox(width: 8.w),
               Container(
                 padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Color(0xFF2563EB),
-                  shape: BoxShape.circle,
-                ),
+                decoration: AppStyles.unreadCountDecoration,
                 child: Text(
                   '${chat.unreadCount}',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppStyles.white,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                   ),

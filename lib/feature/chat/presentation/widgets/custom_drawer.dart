@@ -1,5 +1,8 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:test_app/feature/notification/presentation/screens/notification_screen.dart';
+import 'package:test_app/shared/routers/app_router.dart';
 
 class CustomDrawer extends StatelessWidget {
   final String userName;
@@ -67,7 +70,6 @@ final VoidCallback logout;
                 ),
               ),
               SizedBox(height: 8.h),
-              // Email
               Text(
                 userEmail,
                 style: TextStyle(
@@ -95,7 +97,8 @@ final VoidCallback logout;
                 icon: Icons.notifications_outlined,
                 title: 'Bildirişlər',
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); 
+                  context.router.navigate(NotificationRoute());
                 },
               ),
               Divider(color: Colors.white30, thickness: 1),

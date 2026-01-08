@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/auth/presentation/auth_gate.dart';
 import 'package:test_app/feature/auth/presentation/login_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
+import 'package:test_app/feature/notification/services/notification_service.dart';
 import 'package:test_app/firebase_options.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
-import 'package:test_app/shared/services/notification_service.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();

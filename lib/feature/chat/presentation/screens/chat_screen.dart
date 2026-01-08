@@ -8,8 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/data/models/message.dart';
 import 'package:test_app/feature/chat/logic/bloc/chat/chat_bloc.dart';
+import 'package:test_app/feature/chat/presentation/widgets/chat_header.dart';
+import 'package:test_app/feature/chat/presentation/widgets/chat_input_area.dart';
 import 'package:test_app/feature/chat/presentation/widgets/message_bubble.dart';
 import 'package:test_app/shared/injection_container.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class ChatScreen extends StatelessWidget {
@@ -60,15 +64,15 @@ class _ChatViewState extends State<_ChatView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Mesajı silmək istəyirsiniz?",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+               Text(
+                AppStrings.deleteMessageTitle,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
               ),
               const SizedBox(height: 20),
 
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.blue),
-                title: const Text("Mənim üçün sil"),
+                leading: Icon(Icons.delete_outline, color: AppStyles.primaryBlue),
+                title: const Text(AppStrings.deleteForMe),
                 onTap: () {
                   context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: false));
                   Navigator.pop(bottomSheetContext);
@@ -78,7 +82,7 @@ class _ChatViewState extends State<_ChatView> {
               if (message.isSentByMe)
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text("Hər kəs üçün sil", style: TextStyle(color: Colors.red)),
+                  title: Text(AppStrings.deleteForEveryone, style: TextStyle(color: AppStyles.red)),
                   onTap: () {
                     context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: true));
                     Navigator.pop(bottomSheetContext);
@@ -87,7 +91,7 @@ class _ChatViewState extends State<_ChatView> {
 
               ListTile(
                 leading: const Icon(Icons.close),
-                title: const Text("Ləğv et"),
+                title: const Text(AppStrings.cancel),
                 onTap: () => Navigator.pop(bottomSheetContext),
               ),
             ],
@@ -139,51 +143,9 @@ class _ChatViewState extends State<_ChatView> {
       child: Scaffold(
         body: Column(
           children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)]),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.all(12.sp),
-                  child: Row(
-                    children: [
-                      IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () => Navigator.pop(context)),
-                      Container(
-                        width: 40.w,
-                        height: 40.h,
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3), shape: BoxShape.circle),
-                        child: Center(
-                            child: Text(
-                                widget.chat.name.isNotEmpty
-                                    ? widget.chat.name.substring(0, 1).toUpperCase()
-                                    : '?',
-                                style: const TextStyle(
-                                    color: Colors.white, fontWeight: FontWeight.bold))),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.chat.name,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600),
-                                overflow: TextOverflow.ellipsis),
-                            Text(widget.chat.isOnline ? 'Onlayn' : 'Oflayn',
-                                style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            ChatHeader(
+              chat: widget.chat,
+              onBackPressed: () => Navigator.pop(context),
             ),
 
             BlocBuilder<ChatBloc, ChatState>(
@@ -198,7 +160,7 @@ class _ChatViewState extends State<_ChatView> {
 
             Expanded(
               child: Container(
-                color: Colors.grey[100],
+                color: AppStyles.grey100,
                 child: BlocBuilder<ChatBloc, ChatState>(
                   builder: (context, state) {
                     if (state.status == ChatStatus.loading) {
@@ -206,9 +168,9 @@ class _ChatViewState extends State<_ChatView> {
                     } else if (state.status == ChatStatus.failure) {
                       return Center(child: Text('Xəta: ${state.errorMessage}'));
                     } else if (state.messages.isEmpty) {
-                      return const Center(
-                          child: Text('Hələ mesaj yoxdur.',
-                              style: TextStyle(color: Colors.grey)));
+                      return  Center(
+                          child: Text(AppStrings.noMessages,
+                              style: AppStyles.emptyText));
                     }
 
                     return ListView.builder(
@@ -237,114 +199,20 @@ class _ChatViewState extends State<_ChatView> {
               ),
             ),
 
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey[300]!)),
-              ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    BlocBuilder<ChatBloc, ChatState>(
-                      buildWhen: (previous, current) => previous.replyMessage != current.replyMessage,
-                      builder: (context, state) {
-                        if (state.replyMessage == null) return const SizedBox.shrink();
-
-                        return Container(
-                          padding: const EdgeInsets.all(8),
-                          color: Colors.grey[200],
-                          child: Row(
-                            children: [
-                              const Icon(Icons.reply, color: Color(0xFF2563EB)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Replying to ${state.replyMessage!.isSentByMe ? 'Özünə' : widget.chat.name}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
-                                    ),
-                                    Text(
-                                      state.replyMessage!.text.length > 50 &&
-                                              !state.replyMessage!.text.contains(' ')
-                                          ? "📷 Şəkil"
-                                          : state.replyMessage!.text,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Colors.black54),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close, color: Colors.grey),
-                                onPressed: () {
-                                  context.read<ChatBloc>().add(CancelReply());
-                                },
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                                _isEmojiVisible
-                                    ? Icons.keyboard
-                                    : Icons.emoji_emotions_outlined,
-                                color: Colors.grey[600]),
-                            onPressed: _toggleEmojiKeyboard,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.image_outlined, color: Colors.grey[600]),
-                            onPressed: () => context.read<ChatBloc>().add(SendImage(ImageSource.gallery)),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.camera_alt_outlined, color: Colors.grey[600]),
-                            onPressed: () => context.read<ChatBloc>().add(SendImage(ImageSource.camera)),
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(25)),
-                              child: TextField(
-                                focusNode: _focusNode,
-                                controller: _messageController,
-                                decoration: const InputDecoration(
-                                    hintText: 'Mesaj yazın...',
-                                    border: InputBorder.none,
-                                    contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            decoration: const BoxDecoration(
-                                color: Color(0xFF2563EB), shape: BoxShape.circle),
-                            child: IconButton(
-                              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                              onPressed: () {
-                                context.read<ChatBloc>().add(SendMessage(_messageController.text.trim()));
-                                _messageController.clear();
-                                _scrollToBottom();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            ChatInputArea(
+              chat: widget.chat,
+              controller: _messageController,
+              focusNode: _focusNode,
+              isEmojiVisible: _isEmojiVisible,
+              onEmojiToggle: _toggleEmojiKeyboard,
+              onSendPressed: () {
+                context.read<ChatBloc>().add(SendMessage(_messageController.text.trim()));
+                _messageController.clear();
+                _scrollToBottom();
+              },
+              onImageSelected: (source) {
+                context.read<ChatBloc>().add(SendImage(source));
+              },
             ),
 
             if (_isEmojiVisible)

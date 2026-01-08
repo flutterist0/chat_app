@@ -54,7 +54,6 @@ class NotificationService {
         AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    // 4. Firebase İcazəsi
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
@@ -84,6 +83,7 @@ class NotificationService {
       print('📱 Yeni mesaj: ${message.notification?.title}');
       if (message.notification != null) {
         showNotification(message);
+        _saveNotificationToFirestore(message); 
       }
     });
 
@@ -111,6 +111,24 @@ class NotificationService {
     }
   }
 
+  static Future<void> _saveNotificationToFirestore(RemoteMessage message) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && message.notification != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .add({
+        'title': message.notification!.title,
+        'body': message.notification!.body,
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'data': message.data,
+      });
+      print("✅ Bildiriş Firestore-a yazıldı");
+    }
+  }
+
   static Future<void> showNotification(RemoteMessage message) async {
     try {
       final int id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -135,7 +153,6 @@ class NotificationService {
         autoCancel: true,
         ongoing: false,
         ticker: '${message.notification?.title}: ${message.notification?.body}',
-        // Expanded style
         styleInformation: BigTextStyleInformation(
           message.notification?.body ?? '',
           contentTitle: message.notification?.title,
@@ -188,4 +205,9 @@ class NotificationService {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("📱 Background mesaj: ${message.notification?.title}");
   await NotificationService.showNotification(message);
+  try {
+     await NotificationService._saveNotificationToFirestore(message);
+  } catch(e) {
+     print("Could not save background notification: $e");
+  }
 }

@@ -7,10 +7,13 @@ import 'package:test_app/feature/auth/service/auth_service.dart';
 import 'package:test_app/feature/chat/logic/bloc/chat_list/chat_list_bloc.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_Screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/search_users_screen.dart';
+import 'package:test_app/feature/chat/presentation/widgets/chat_list_header.dart';
 import 'package:test_app/feature/chat/presentation/widgets/chat_list_item.dart';
 import 'package:test_app/feature/chat/presentation/widgets/custom_drawer.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class ChatsListScreen extends StatelessWidget {
@@ -53,62 +56,10 @@ class _ChatsListViewState extends State<_ChatsListView> {
       ),
       body: Column(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Mesajlar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.more_vert, color: Colors.white),
-                          onPressed: () {
-                            _scaffoldKey.currentState?.openDrawer();
-                          },
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: TextField(
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: 'Axtar...',
-                          hintStyle: const TextStyle(color: Colors.white70),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20.sp,
-                            vertical: 15.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          ChatListHeader(
+            onMenuPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
           ),
 
           Expanded(
@@ -126,7 +77,7 @@ class _ChatsListViewState extends State<_ChatsListView> {
                         children: [
                           Icon(Icons.chat_bubble_outline, size: 64.sp, color: Colors.grey),
                           SizedBox(height: 16.h),
-                          const Text("Hələ heç kimlə danışmamısınız"),
+                          const Text(AppStrings.noChats),
                         ],
                       ),
                     );
@@ -156,7 +107,7 @@ class _ChatsListViewState extends State<_ChatsListView> {
         onPressed: () {
           context.router.push(SearchUsersRoute());
         },
-        backgroundColor: const Color(0xFF2563EB),
+        backgroundColor: AppStyles.primaryBlue,
         elevation: 4.sp,
         child: const Icon(Icons.add),
       ),

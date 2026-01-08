@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:test_app/shared/routers/app_router.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
 
 @RoutePage()
 class SplashScreen extends StatefulWidget {
@@ -40,21 +42,16 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100,
-              height: 100,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF9333EA)],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
+              width: 100.w,
+              height: 100.w,
+              decoration: AppStyles.circleGradientDecoration,
+              child: Icon(
                 Icons.chat_bubble_rounded,
-                size: 50,
-                color: Colors.white,
+                size: 50.sp,
+                color: AppStyles.white,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             const CircularProgressIndicator(),
           ],
         ),

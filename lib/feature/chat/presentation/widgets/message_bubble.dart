@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/message.dart';
+import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/shared/utils/app_strings.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -34,7 +36,7 @@ class MessageBubble extends StatelessWidget {
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 20),
         color: Colors.transparent,
-        child: Icon(Icons.reply, color: Colors.grey[600], size: 30),
+        child: Icon(Icons.reply, color: AppStyles.grey600, size: 30),
       ),
       child: GestureDetector(
         onLongPress: (){
@@ -48,22 +50,7 @@ class MessageBubble extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             padding: EdgeInsets.all(isImage ? 4 : 10),
             constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-            decoration: BoxDecoration(
-              color: message.isSentByMe ? const Color(0xFF2563EB) : Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: message.isSentByMe ? const Radius.circular(16) : const Radius.circular(0),
-                bottomRight: message.isSentByMe ? const Radius.circular(0) : const Radius.circular(16),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            decoration: AppStyles.messageBubbleDecoration(isSentByMe: message.isSentByMe),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -72,24 +59,15 @@ class MessageBubble extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border(
-                        left: BorderSide(
-                          color: message.isSentByMe ? Colors.white : const Color(0xFF2563EB),
-                          width: 4,
-                        ),
-                      ),
-                    ),
+                    decoration: AppStyles.replyMessageDecoration(isSentByMe: message.isSentByMe),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          message.replySender ?? 'İstifadəçi',
+                          message.replySender ?? AppStrings.user,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: message.isSentByMe ? Colors.white70 : const Color(0xFF2563EB),
+                            color: message.isSentByMe ? AppStyles.white70 : AppStyles.primaryBlue,
                             fontSize: 12.sp,
                           ),
                         ),
@@ -99,7 +77,7 @@ class MessageBubble extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: message.isSentByMe ? Colors.white60 : Colors.black54,
+                            color: message.isSentByMe ? AppStyles.white60 : AppStyles.black54,
                             fontSize: 12.sp,
                           ),
                         ),
@@ -119,7 +97,7 @@ class MessageBubble extends StatelessWidget {
                           base64Decode(message.text),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.broken_image, color: Colors.white);
+                            return Icon(Icons.broken_image, color: AppStyles.white);
                           },
                         ),
                       ),
@@ -127,33 +105,31 @@ class MessageBubble extends StatelessWidget {
                         : Text(
                       message.text,
                       style: TextStyle(
-                        color: message.isSentByMe ? Colors.white : Colors.black87,
+                        color: message.isSentByMe ? AppStyles.white : AppStyles.black87,
                         fontSize: 16.sp,
                       ),
                     ),
                     const SizedBox(height: 4),
         
-                    // Mesajın vaxtı və Oxunma statusu
+
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           message.time,
                           style: TextStyle(
-                            color: message.isSentByMe ? Colors.white70 : Colors.grey[500],
+                            color: message.isSentByMe ? AppStyles.white70 : AppStyles.grey500,
                             fontSize: 10.sp,
                           ),
                         ),
-                        // Yalnız mənim göndərdiyim mesajlarda "Tık" göstər
                         if (message.isSentByMe) ...[
                           const SizedBox(width: 4),
                           Icon(
-                            Icons.done_all, // İki tık işarəsi
+                            Icons.done_all, 
                             size: 16.sp,
-                            // Oxunubsa açıq mavi (və ya ağ), oxunmayıbsa boz/yarımşəffaf
                             color: message.isRead
-                                ? Colors.lightBlueAccent // Qarşı tərəf oxuyub
-                                : Colors.white54,        // Hələ oxunmayıb
+                                ? AppStyles.lightBlueAccent 
+                                : AppStyles.white54,
                           ),
                         ]
                       ],
@@ -170,7 +146,7 @@ class MessageBubble extends StatelessWidget {
 
   String _getPreviewText(String text) {
     if (text.length > 50 && !text.contains(' ')) {
-      return "📷 Şəkil";
+      return AppStrings.photo;
     }
     return text;
   }
