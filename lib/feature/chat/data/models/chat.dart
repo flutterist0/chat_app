@@ -5,6 +5,7 @@ class Chat {
   final String time;
   final int unreadCount;
   final bool isOnline;
+  final String? photoUrl;
 
   Chat({
     required this.id,
@@ -13,5 +14,6 @@ class Chat {
     required this.time,
     required this.unreadCount,
     required this.isOnline,
+    this.photoUrl,
   });
 }

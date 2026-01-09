@@ -25,17 +25,50 @@ class ChatListItem extends StatelessWidget {
                 Container(
                   width: 56.w,
                   height: 56.h,
-                  decoration: AppStyles.circleGradientDecoration,
-                  child: Center(
-                    child: Text(
-                      chat.name.split(' ').map((e) => e[0]).take(2).join(),
-                      style: TextStyle(
-                        color: AppStyles.white,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  decoration: chat.photoUrl != null
+                      ? null
+                      : AppStyles.circleGradientDecoration,
+                  child: chat.photoUrl != null
+                      ? ClipOval(
+                          child: Image.network(
+                            chat.photoUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                decoration: AppStyles.circleGradientDecoration,
+                                child: Center(
+                                  child: Text(
+                                    chat.name.isEmpty
+                                        ? '?'
+                                        : chat.name[0].toUpperCase(),
+                                    style: TextStyle(
+                                      color: AppStyles.white,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            chat.name.isNotEmpty
+                                ? chat.name
+                                    .split(' ')
+                                    .map((e) => e.isNotEmpty ? e[0] : '')
+                                    .take(2)
+                                    .join()
+                                    .toUpperCase()
+                                : '?',
+                            style: TextStyle(
+                              color: AppStyles.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                 ),
                 if (chat.isOnline)
                   Positioned(
@@ -62,7 +95,8 @@ class ChatListItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: AppStyles.grey900,
+                          color: AppStyles.grey900
+                            
                         ),
                       ),
                       Text(

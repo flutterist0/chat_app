@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:test_app/feature/auth/logic/bloc/login/login_bloc.dart';
+import 'package:test_app/feature/auth/service/auth_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_app/feature/auth/logic/bloc/register/register_bloc.dart';
@@ -15,12 +17,21 @@ import 'package:test_app/feature/notification/domain/repositories/notification_r
 
 import 'package:test_app/feature/notification/logic/bloc/notification_bloc.dart';
 import 'package:test_app/feature/chat/service/chat_service.dart';
-import '../feature/auth/service/auth_service.dart';
-import '../feature/auth/logic/bloc/login/login_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:test_app/feature/account/data/repositories/account_repository_impl.dart';
+import 'package:test_app/feature/account/domain/repositories/account_repository.dart';
+import 'package:test_app/feature/account/logic/bloc/account_bloc.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_app/feature/settings/data/repositories/settings_repository_impl.dart';
+import 'package:test_app/feature/settings/domain/repositories/settings_repository.dart';
+import 'package:test_app/feature/settings/logic/bloc/settings_bloc.dart';
 
 final getIt = GetIt.instance;
 
-void setupLocator() {
+Future<void> setupLocator() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton(() => sharedPreferences);
 
   getIt.registerLazySingleton<AuthService>(() => AuthService());
   getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt<AuthService>()));
@@ -31,9 +42,9 @@ if (!getIt.isRegistered<FirebaseFirestore>()) {
      getIt.registerLazySingleton(() => FirebaseAuth.instance);
   }
 
-  getIt.registerFactory<LoginBloc>(() => LoginBloc(getIt<AuthRepository>()));
+  getIt.registerFactory<LoginBloc>(() => LoginBloc(getIt<AuthRepository>(), getIt<AccountRepository>()));
 
-  getIt.registerFactory<RegisterBloc>(() => RegisterBloc(getIt<AuthRepository>()));
+  getIt.registerFactory<RegisterBloc>(() => RegisterBloc(getIt<AuthRepository>(), getIt<AccountRepository>()));
 
   getIt.registerFactory<ChatListBloc>(
     () => ChatListBloc(getIt<ChatRepository>(), getIt<FirebaseAuth>()),
@@ -58,4 +69,11 @@ if (!getIt.isRegistered<FirebaseFirestore>()) {
 
   getIt.registerLazySingleton<NotificationRepository>(() => NotificationRepositoryImpl(getIt<FirebaseFirestore>()));
   getIt.registerFactory<NotificationBloc>(() => NotificationBloc(getIt<NotificationRepository>()));
+
+  getIt.registerLazySingleton(() => const FlutterSecureStorage());
+  getIt.registerLazySingleton<AccountRepository>(() => AccountRepositoryImpl(getIt<FlutterSecureStorage>(), getIt<AuthService>()));
+  getIt.registerFactory<AccountBloc>(() => AccountBloc(getIt<AccountRepository>(), getIt<FirebaseAuth>()));
+
+  getIt.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(getIt<SharedPreferences>()));
+  getIt.registerFactory<SettingsBloc>(() => SettingsBloc(getIt<SettingsRepository>(), getIt<AuthRepository>()));
 }

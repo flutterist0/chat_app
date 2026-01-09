@@ -80,10 +80,11 @@ final VoidCallback logout;
               SizedBox(height: 40.h),
               Divider(color: Colors.white30, thickness: 1),
               _DrawerMenuItem(
-                icon: Icons.person_outline,
-                title: 'Profil',
+                icon: Icons.manage_accounts_outlined,
+                title: 'Hesablar',
                 onTap: () {
                   Navigator.pop(context);
+                  context.router.push(AccountCenterRoute());
                 },
               ),
               _DrawerMenuItem(
@@ -91,6 +92,7 @@ final VoidCallback logout;
                 title: 'Tənzimləmələr',
                 onTap: () {
                   Navigator.pop(context);
+                  context.router.push(SettingsRoute());
                 },
               ),
               _DrawerMenuItem(

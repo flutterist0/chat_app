@@ -41,6 +41,7 @@ class SearchUserBloc extends Bloc<SearchUserEvent, SearchUserState> {
             name: data['name'] ?? 'Adsız',
             email: data['email'] ?? '',
             isOnline: data['isOnline'] ?? false,
+            photoUrl: data['photoUrl'],
           );
         }).where((user) => user.id != currentUserId).toList(); 
 

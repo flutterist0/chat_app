@@ -10,3 +10,5 @@ class RegisterSubmitted extends RegisterEvent {
 
   RegisterSubmitted({required this.fullName, required this.email, required this.password});
 }
+
+class RegisterWithGoogle extends RegisterEvent {}

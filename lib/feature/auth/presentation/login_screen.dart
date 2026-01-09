@@ -127,20 +127,41 @@ class _LoginViewState extends State<_LoginView> {
                           style: AppStyles.buttonText,
                         ),
                       ),
+                      SizedBox(height: 16.h),
+                      OutlinedButton.icon(
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                context.read<LoginBloc>().add(LoginWithGoogle());
+                              },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          side: BorderSide(color: AppStyles.primaryBlue),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: Icon(Icons.g_mobiledata, size: 32.sp, color: AppStyles.primaryBlue),
+                        label: Text(
+                          "Google ilə davam et",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppStyles.primaryBlue,
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 24.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             AppStrings.dontHaveAccount,
-                            style: AppStyles.bodyText,
+                            style: AppStyles.bodyText(context),
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => RegisterScreen()),
-                              );
+                              context.router.push(RegisterRoute());
                             },
                             child: Text(
                               AppStrings.toRegister,
@@ -148,6 +169,17 @@ class _LoginViewState extends State<_LoginView> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(height: 24.h),
+                      TextButton.icon(
+                        onPressed: () {
+                          context.router.push(AccountCenterRoute());
+                        },
+                        icon: Icon(Icons.manage_accounts, color: AppStyles.primaryBlue),
+                        label: Text(
+                          "Yadda saxlanılan hesablar",
+                          style: TextStyle(color: AppStyles.primaryBlue),
+                        ),
                       ),
                     ],
                   ),

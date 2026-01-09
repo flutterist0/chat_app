@@ -25,17 +25,38 @@ class UserListItem extends StatelessWidget {
                 Container(
                   width: 56.w,
                   height: 56.h,
-                  decoration: AppStyles.circleGradientDecoration,
-                  child: Center(
-                    child: Text(
-                      user.name.split(' ').map((e) => e[0]).take(2).join(),
-                      style: TextStyle(
-                        color: AppStyles.white,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  decoration: user.photoUrl != null ? null : AppStyles.circleGradientDecoration,
+                  child: user.photoUrl != null
+                      ? ClipOval(
+                          child: Image.network(
+                            user.photoUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                                decoration: AppStyles.circleGradientDecoration,
+                                child: Center(
+                                  child: Text(
+                                    user.name.isEmpty ? '?' : user.name[0].toUpperCase(),
+                                    style: TextStyle(
+                                      color: AppStyles.white,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )),
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            user.name.isEmpty
+                                ? '?'
+                                : user.name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase(),
+                            style: TextStyle(
+                              color: AppStyles.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                 ),
                 if (user.isOnline)
                   Positioned(
@@ -59,7 +80,7 @@ class UserListItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: AppStyles.grey900,
+                      color:  AppStyles.grey900,
                     ),
                   ),
                   SizedBox(height: 4.h),

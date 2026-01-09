@@ -160,7 +160,9 @@ class _ChatViewState extends State<_ChatView> {
 
             Expanded(
               child: Container(
-                color: AppStyles.grey100,
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Colors.black 
+                    : AppStyles.grey100,
                 child: BlocBuilder<ChatBloc, ChatState>(
                   builder: (context, state) {
                     if (state.status == ChatStatus.loading) {

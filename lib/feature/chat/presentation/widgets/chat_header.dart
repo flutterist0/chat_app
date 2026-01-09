@@ -32,15 +32,33 @@ class ChatHeader extends StatelessWidget {
               Container(
                 width: 40.w,
                 height: 40.h,
-                decoration: AppStyles.chatHeaderProfileDecoration,
-                child: Center(
-                  child: Text(
-                    chat.name.isNotEmpty
-                        ? chat.name.substring(0, 1).toUpperCase()
-                        : '?',
-                    style: AppStyles.chatName,
-                  ),
-                ),
+                decoration: chat.photoUrl != null ? null : AppStyles.chatHeaderProfileDecoration,
+                child: chat.photoUrl != null
+                    ? ClipOval(
+                        child: Image.network(
+                          chat.photoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: AppStyles.chatHeaderProfileDecoration,
+                              child: Center(
+                                child: Text(
+                                  chat.name.isEmpty ? '?' : chat.name[0].toUpperCase(),
+                                  style: AppStyles.chatName,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          chat.name.isNotEmpty
+                              ? chat.name.substring(0, 1).toUpperCase()
+                              : '?',
+                          style: AppStyles.chatName,
+                        ),
+                      ),
               ),
               SizedBox(width: 12.w),
               Expanded(

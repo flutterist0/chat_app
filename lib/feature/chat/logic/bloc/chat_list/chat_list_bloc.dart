@@ -12,11 +12,18 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
   final ChatRepository _chatRepository;
   final FirebaseAuth _auth;
   StreamSubscription? _chatsSubscription;
+  StreamSubscription? _authSubscription;
 
   ChatListBloc(this._chatRepository, this._auth) : super(ChatListInitial()) {
     on<LoadChats>(_onLoadChats);
     on<UpdateChats>((event, emit) => emit(ChatListLoaded(event.chats)));
     on<ChatListError>((event, emit) => emit(ChatListFailure(event.message)));
+
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      if (user != null) {
+        add(LoadChats());
+      }
+    });
   }
 
   void _onLoadChats(LoadChats event, Emitter<ChatListState> emit) {
@@ -42,6 +49,7 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
   @override
   Future<void> close() {
     _chatsSubscription?.cancel();
+    _authSubscription?.cancel();
     return super.close();
   }
 }

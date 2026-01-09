@@ -3,9 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
 
 class AuthHeader extends StatelessWidget {
-  final IconData icon; // Keep as IconData, but check usage in screens.
-  // Login: Icons.chat_bubble_rounded
-  // Register: Icons.person_add_rounded
+  final IconData icon;
   final String title;
   final String subTitle;
   final double iconSize;
@@ -24,7 +22,7 @@ class AuthHeader extends StatelessWidget {
       children: [
         Container(
           width: iconSize.w,
-          height: iconSize.w, // Using .w for both to keep it square and responsive width-wise
+          height: iconSize.w,
           decoration: AppStyles.circleGradientDecoration,
           child: Icon(
             icon,
@@ -36,13 +34,13 @@ class AuthHeader extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: AppStyles.headerLarge,
+          style: AppStyles.headerLarge(context),
         ),
         SizedBox(height: 8.h),
         Text(
           subTitle,
           textAlign: TextAlign.center,
-          style: AppStyles.subHeader,
+          style: AppStyles.subHeader(context),
         ),
       ],
     );

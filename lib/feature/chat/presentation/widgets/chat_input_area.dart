@@ -29,7 +29,7 @@ class ChatInputArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: AppStyles.chatInputAreaDecoration,
+      decoration: AppStyles.chatInputAreaDecorationAdaptive(context),
       child: SafeArea(
         child: Column(
           children: [
@@ -41,7 +41,7 @@ class ChatInputArea extends StatelessWidget {
 
                 return Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: AppStyles.replyPanelDecoration,
+                  decoration: AppStyles.replyPanelDecoration(context),
                   child: Row(
                     children: [
                       Icon(Icons.reply, color: AppStyles.primaryBlue),
@@ -99,7 +99,7 @@ class ChatInputArea extends StatelessWidget {
                   ),
                   Expanded(
                     child: Container(
-                      decoration: AppStyles.inputContainerDecoration,
+                      decoration: AppStyles.inputContainerDecoration(context),
                       child: TextField(
                         focusNode: focusNode,
                         controller: controller,

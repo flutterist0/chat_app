@@ -38,79 +38,83 @@ class _ChatsListView extends StatefulWidget {
 class _ChatsListViewState extends State<_ChatsListView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   
-  final User? currentUser = FirebaseAuth.instance.currentUser;
-  final AuthService authService = AuthService();
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: CustomDrawer(
-        userName: currentUser?.displayName ?? '',
-        userEmail: currentUser?.email ?? '',
-        userImageUrl: null,
-        logout: () {
-          authService.signOut();
-          context.router.replace(LoginRoute());
-        },
-      ),
-      body: Column(
-        children: [
-          ChatListHeader(
-            onMenuPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.userChanges(),
+      builder: (context, snapshot) {
+        final currentUser = snapshot.data;
+        
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: CustomDrawer(
+            userName: currentUser?.displayName ?? '',
+            userEmail: currentUser?.email ?? '',
+            userImageUrl: currentUser?.photoURL,
+            logout: () {
+               getIt<AuthService>().signOut();
+               context.router.replace(LoginRoute());
             },
           ),
+          body: Column(
+            children: [
+              ChatListHeader(
+                onMenuPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+              ),
 
-          Expanded(
-            child: BlocBuilder<ChatListBloc, ChatListState>(
-              builder: (context, state) {
-                if (state is ChatListLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ChatListFailure) {
-                  return Center(child: Text("Xəta: ${state.message}"));
-                } else if (state is ChatListLoaded) {
-                  if (state.chats.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.chat_bubble_outline, size: 64.sp, color: Colors.grey),
-                          SizedBox(height: 16.h),
-                          const Text(AppStrings.noChats),
-                        ],
-                      ),
-                    );
-                  }
+              Expanded(
+                child: BlocBuilder<ChatListBloc, ChatListState>(
+                  builder: (context, state) {
+                    if (state is ChatListLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is ChatListFailure) {
+                      return Center(child: Text("Xəta: ${state.message}"));
+                    } else if (state is ChatListLoaded) {
+                      if (state.chats.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.chat_bubble_outline, size: 64.sp, color: Colors.grey),
+                              SizedBox(height: 16.h),
+                              const Text(AppStrings.noChats),
+                            ],
+                          ),
+                        );
+                      }
 
-                  return ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: state.chats.length,
-                    itemBuilder: (context, index) {
-                      final chat = state.chats[index];
-                      return ChatListItem(
-                        chat: chat,
-                        onTap: () {
-                          context.router.push(ChatRoute(chat: chat));
+                      return ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: state.chats.length,
+                        itemBuilder: (context, index) {
+                          final chat = state.chats[index];
+                          return ChatListItem(
+                            chat: chat,
+                            onTap: () {
+                              context.router.push(ChatRoute(chat: chat));
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.router.push(SearchUsersRoute());
-        },
-        backgroundColor: AppStyles.primaryBlue,
-        elevation: 4.sp,
-        child: const Icon(Icons.add),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              context.router.push(SearchUsersRoute());
+            },
+            backgroundColor: AppStyles.primaryBlue,
+            elevation: 4.sp,
+            child: const Icon(Icons.add),
+          ),
+        );
+      }
     );
   }
 }

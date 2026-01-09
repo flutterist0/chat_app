@@ -44,19 +44,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ids.sort();
     chatId = ids.join("_");
 
-    // Mark messages as read initially and start listening
     _chatRepository.markMessagesAsRead(chatId, currentUserId);
 
     _messagesSubscription?.cancel();
     _messagesSubscription = _chatRepository.getMessages(chatId, currentUserId).listen(
       (messages) {
-        // Also ensure messages are marked as read when new ones arrive that are not from me
-        // Ideally this should be optimized but calling it here ensures updates.
-        // Actually, for simplicity, let's just update the state.
-        // If we want to mark as read on arrival, we can do it here or let the repo handle it implicitly. 
-        // Given I separated it, I should call it.
-        // However, continuously calling markRead might be heavy. 
-        // Let's assume the user viewing the screen implies reading.
         _chatRepository.markMessagesAsRead(chatId, currentUserId);
         
         add(ChatUpdated(messages));

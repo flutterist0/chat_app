@@ -176,6 +176,7 @@ class ChatService {
       var userData = userDoc.data();
 
       String name = userData?['name'] ?? 'Naməlum';
+      String? photoUrl = userData?['photoUrl'];
       bool isOnline = userData?['isOnline'] ?? false;
 
       Map<String, dynamic> unreadCounts = chatData['unreadCounts'] ?? {};
@@ -188,6 +189,7 @@ class ChatService {
         time: _formatTimestamp(chatData['lastMessageTime']),
         unreadCount: myUnreadCount,
         isOnline: isOnline,
+        photoUrl: photoUrl,
       );
     }).toList();
 

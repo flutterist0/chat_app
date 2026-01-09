@@ -49,6 +49,8 @@ class _RegisterViewState extends State<_RegisterView> {
                 backgroundColor: Colors.green,
               ),
             );
+          } else if (state is RegisterGoogleSuccess) {
+             context.router.replaceAll([ChatsListRoute()]);
           } else if (state is RegisterFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -173,6 +175,30 @@ class _RegisterViewState extends State<_RegisterView> {
                                   style: AppStyles.buttonText,
                               ),
                       ),
+                      SizedBox(height: 16.h),
+                      OutlinedButton.icon(
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                context.read<RegisterBloc>().add(RegisterWithGoogle());
+                              },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          side: BorderSide(color: AppStyles.primaryBlue),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: Icon(Icons.g_mobiledata, size: 32.sp, color: AppStyles.primaryBlue),
+                        label: Text(
+                          "Google ilə davam et",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppStyles.primaryBlue,
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 24.h),
                       
                       Row(
@@ -180,7 +206,7 @@ class _RegisterViewState extends State<_RegisterView> {
                         children: [
                           Text(
                             AppStrings.alreadyHaveAccount,
-                            style: AppStyles.bodyText,
+                            style: AppStyles.bodyText(context),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pop(context),

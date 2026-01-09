@@ -44,10 +44,10 @@ class AppStyles {
   );
 
   // TextStyles
-  static TextStyle get headerLarge => TextStyle(
+  static TextStyle headerLarge(BuildContext context) => TextStyle(
     fontSize: 28.sp,
     fontWeight: FontWeight.bold,
-    color: grey900,
+    color: Theme.of(context).brightness == Brightness.dark ? white : grey900,
   );
   
   static TextStyle get headerWhite => TextStyle(
@@ -89,9 +89,9 @@ class AppStyles {
     color: black54,
   );
 
-  static TextStyle get subHeader => TextStyle(
+  static TextStyle subHeader(BuildContext context) => TextStyle(
     fontSize: 16.sp,
-    color: grey600,
+    color: Theme.of(context).brightness == Brightness.dark ? grey400 : grey600,
   );
   
   static TextStyle get buttonText => TextStyle(
@@ -106,8 +106,8 @@ class AppStyles {
     fontSize: 14.sp, 
   );
 
-  static TextStyle get bodyText => TextStyle(
-    color: grey600,
+  static TextStyle bodyText(BuildContext context) => TextStyle(
+    color: Theme.of(context).brightness == Brightness.dark ? grey400 : grey600,
     fontSize: 14.sp,
   );
   
@@ -180,8 +180,8 @@ class AppStyles {
     shape: BoxShape.circle,
   );
 
-  static BoxDecoration get inputContainerDecoration => BoxDecoration(
-    color: grey100,
+  static BoxDecoration inputContainerDecoration(BuildContext context) => BoxDecoration(
+    color: Theme.of(context).brightness == Brightness.dark ? grey900 : grey100,
     borderRadius: BorderRadius.circular(25.r),
   );
 
@@ -190,13 +190,18 @@ class AppStyles {
     shape: BoxShape.circle,
   );
 
-  static BoxDecoration get replyPanelDecoration => BoxDecoration(
-    color: grey200,
+  static BoxDecoration replyPanelDecoration(BuildContext context) => BoxDecoration(
+    color: Theme.of(context).brightness == Brightness.dark ? Colors.black54 : grey200,
   );
   
   static BoxDecoration get chatInputAreaDecoration => BoxDecoration(
     color: white,
     border: Border(top: BorderSide(color: grey300)),
+  );
+  
+  static BoxDecoration chatInputAreaDecorationAdaptive(BuildContext context) => BoxDecoration(
+    color: Theme.of(context).cardColor,
+    border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
   );
 
   static BoxDecoration get onlineIndicatorDecoration => BoxDecoration(
@@ -215,9 +220,11 @@ class AppStyles {
     shape: BoxShape.circle,
   );
 
-  static Decoration messageBubbleDecoration({required bool isSentByMe}) {
+  static Decoration messageBubbleDecoration(BuildContext context, {required bool isSentByMe}) {
     return BoxDecoration(
-      color: isSentByMe ? primaryBlue : white,
+      color: isSentByMe 
+          ? primaryBlue 
+          : (Theme.of(context).brightness == Brightness.dark ? grey700 : white),
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(16.r),
         topRight: Radius.circular(16.r),

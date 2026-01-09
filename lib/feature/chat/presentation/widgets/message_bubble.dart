@@ -44,72 +44,74 @@ class MessageBubble extends StatelessWidget {
             onLongPress!(message);
           }
         },
-        child: Align(
-          alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            padding: EdgeInsets.all(isImage ? 4 : 10),
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-            decoration: AppStyles.messageBubbleDecoration(isSentByMe: message.isSentByMe),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isReply)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(8),
-                    decoration: AppStyles.replyMessageDecoration(isSentByMe: message.isSentByMe),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          message.replySender ?? AppStrings.user,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: message.isSentByMe ? AppStyles.white70 : AppStyles.primaryBlue,
-                            fontSize: 12.sp,
+          child: Align(
+            alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              padding: EdgeInsets.all(isImage ? 4 : 10),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+              decoration: AppStyles.messageBubbleDecoration(context, isSentByMe: message.isSentByMe),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isReply)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(8),
+                      decoration: AppStyles.replyMessageDecoration(isSentByMe: message.isSentByMe),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            message.replySender ?? AppStrings.user,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: message.isSentByMe ? AppStyles.white70 : AppStyles.primaryBlue,
+                              fontSize: 12.sp,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _getPreviewText(message.replyText!),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: message.isSentByMe ? AppStyles.white60 : AppStyles.black54,
-                            fontSize: 12.sp,
+                          const SizedBox(height: 2),
+                          Text(
+                            _getPreviewText(message.replyText!),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: message.isSentByMe ? AppStyles.white60 : AppStyles.black54,
+                              fontSize: 12.sp,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-        
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    isImage
-                        ? GestureDetector(
-                      onTap: () => _showFullImage(context, message.text),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.memory(
-                          base64Decode(message.text),
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.broken_image, color: AppStyles.white);
-                          },
-                        ),
-                      ),
-                    )
-                        : Text(
-                      message.text,
-                      style: TextStyle(
-                        color: message.isSentByMe ? AppStyles.white : AppStyles.black87,
-                        fontSize: 16.sp,
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
+          
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      isImage
+                          ? GestureDetector(
+                        onTap: () => _showFullImage(context, message.text),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.memory(
+                            base64Decode(message.text),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.broken_image, color: AppStyles.white);
+                            },
+                          ),
+                        ),
+                      )
+                          : Text(
+                        message.text,
+                        style: TextStyle(
+                          color: message.isSentByMe 
+                              ? AppStyles.white 
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppStyles.black87),
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
         
 
                     Row(
