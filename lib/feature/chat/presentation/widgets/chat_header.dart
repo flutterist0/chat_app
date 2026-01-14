@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class ChatHeader extends StatelessWidget {
   final Chat chat;
@@ -71,7 +71,7 @@ class ChatHeader extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      chat.isOnline ? AppStrings.online : AppStrings.offline,
+                      chat.isOnline ? AppLocalizations.of(context)!.online : AppLocalizations.of(context)!.offline,
                       style: AppStyles.chatStatus,
                     ),
                   ],

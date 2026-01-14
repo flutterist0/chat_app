@@ -46,7 +46,7 @@ abstract class _$AppRouter extends RootStackRouter {
     LoginRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: LoginScreen(),
+        child: const LoginScreen(),
       );
     },
     NotificationRoute.name: (routeData) {
@@ -58,7 +58,7 @@ abstract class _$AppRouter extends RootStackRouter {
     RegisterRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: RegisterScreen(),
+        child: const RegisterScreen(),
       );
     },
     SearchUsersRoute.name: (routeData) {

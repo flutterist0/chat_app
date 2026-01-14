@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:test_app/feature/account/logic/bloc/account_bloc.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
@@ -32,7 +33,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "Hesab Mərkəzi",
+            AppLocalizations.of(context)!.accountCenterTitle,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -54,7 +55,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
             if (state is AccountLoading) {
               return Center(child: CircularProgressIndicator());
             } else if (state is AccountError) {
-              return Center(child: Text("Xəta: ${state.message}"));
+              return Center(child: Text("${AppLocalizations.of(context)!.error}: ${state.message}"));
             } else if (state is AccountLoaded) {
               return Column(
                 children: [
@@ -82,10 +83,10 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                               backgroundImage: account.photoUrl != null
                                   ? NetworkImage(account.photoUrl!)
                                   : null,
+                              backgroundColor: AppStyles.primaryBlue.withOpacity(0.7),
                               child: account.photoUrl == null
                                   ? Icon(Icons.person, color: Colors.white)
                                   : null,
-                              backgroundColor: AppStyles.primaryBlue.withOpacity(0.7),
                             ),
                             title: Text(
                               account.displayName,
@@ -126,7 +127,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                           }
                         },
                         icon: Icon(Icons.add),
-                        label: Text(_initialUserId == null ? "Yeni hesab ilə giriş" : "Hesab əlavə et"),
+                        label: Text(_initialUserId == null ? AppLocalizations.of(context)!.newAccountLogin : AppLocalizations.of(context)!.addAccount),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 16.h),
                           backgroundColor: AppStyles.primaryBlue,
@@ -152,19 +153,19 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Hesabı sil"),
-        content: Text("${account.email} hesabını siyahıdan silmək istədiyinizə əminsiniz?"),
+        title: Text(AppLocalizations.of(context)!.removeAccountDialogTitle),
+        content: Text(AppLocalizations.of(context)!.removeAccountDialogContent(account.email)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text("Xeyr"),
+            child: Text(AppLocalizations.of(context)!.no),
           ),
           TextButton(
             onPressed: () {
               context.read<AccountBloc>().add(RemoveAccount(account.uid));
               Navigator.pop(ctx);
             },
-            child: Text("Bəli", style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context)!.yes, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -175,19 +176,19 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Hesabı dəyiş"),
-        content: Text("${account.email} hesabına keçmək istəyirsiniz?"),
+        title: Text(AppLocalizations.of(context)!.switchAccountDialogTitle),
+        content: Text(AppLocalizations.of(context)!.switchAccountDialogContent(account.email)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text("Xeyr"),
+            child: Text(AppLocalizations.of(context)!.no),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AccountBloc>().add(SwitchAccount(account));
             },
-            child: Text("Bəli"),
+            child: Text(AppLocalizations.of(context)!.yes),
           ),
         ],
       ),

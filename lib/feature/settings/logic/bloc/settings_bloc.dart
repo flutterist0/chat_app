@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:test_app/feature/settings/domain/repositories/settings_repository.dart';
 
@@ -17,16 +18,19 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleNotifications>(_onToggleNotifications);
     on<UpdateProfileImage>(_onUpdateProfileImage);
     on<DeleteProfileImage>(_onDeleteProfileImage);
+    on<ChangeLanguage>(_onChangeLanguage);
   }
 
   Future<void> _onLoadSettings(LoadSettings event, Emitter<SettingsState> emit) async {
     final isDark = await _settingsRepository.getIsDarkMode();
     final notifications = await _settingsRepository.getNotificationsEnabled();
+    final languageCode = await _settingsRepository.getLanguageCode();
     final user = _authRepository.currentUser;
     emit(state.copyWith(
       isDarkMode: isDark, 
       notificationsEnabled: notifications,
       profileImageUrl: user?.photoURL,
+      locale: Locale(languageCode),
     ));
   }
 
@@ -54,13 +58,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   Future<void> _onDeleteProfileImage(DeleteProfileImage event, Emitter<SettingsState> emit) async {
     try {
       await _authRepository.deleteProfileImage();
-      emit(SettingsState(
-        isDarkMode: state.isDarkMode,
-        notificationsEnabled: state.notificationsEnabled,
-        profileImageUrl: null,
-      ));
+      emit(state.copyWith(profileImageUrl: null)); // Use copyWith instead of creating new state
     } catch (e) {
       print("Profile delete error: $e");
     }
+  }
+
+  Future<void> _onChangeLanguage(ChangeLanguage event, Emitter<SettingsState> emit) async {
+    await _settingsRepository.setLanguageCode(event.languageCode);
+    emit(state.copyWith(locale: Locale(event.languageCode)));
   }
 }

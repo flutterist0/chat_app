@@ -4,12 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/auth/service/auth_service.dart';
 import 'package:test_app/feature/settings/logic/bloc/settings_bloc.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 
 @RoutePage()
 class SettingsScreen extends StatelessWidget {
@@ -20,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Tənzimləmələr",
+          AppLocalizations.of(context)!.settingsTitle,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -56,10 +58,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20.h),
-              _buildSectionTitle(context, "Bildirişlər"),
+              _buildSectionTitle(context, AppLocalizations.of(context)!.notifications),
               SwitchListTile(
                 title: Text(
-                  "Bildirişləri al",
+                  AppLocalizations.of(context)!.receiveNotifications,
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
@@ -73,9 +75,9 @@ class SettingsScreen extends StatelessWidget {
                     color: AppStyles.primaryBlue),
               ),
               Divider(color: Colors.grey.withOpacity(0.3)),
-              _buildSectionTitle(context, "Görünüş"),
+              _buildSectionTitle(context, AppLocalizations.of(context)!.appearance),
               SwitchListTile(
-                title: Text("Qaranlıq rejim"),
+                title: Text(AppLocalizations.of(context)!.darkMode),
                 value: state.isDarkMode,
                 onChanged: (value) {
                   context.read<SettingsBloc>().add(ToggleTheme());
@@ -84,26 +86,34 @@ class SettingsScreen extends StatelessWidget {
                 secondary: Icon(Icons.dark_mode_outlined, color: Colors.purple),
               ),
               Divider(color: Colors.grey.withOpacity(0.3)),
-              _buildSectionTitle(context, "Hesab"),
+               _buildSectionTitle(context, AppLocalizations.of(context)!.language),
+              ListTile(
+                leading: Icon(Icons.language, color: Colors.blue),
+                title: Text(AppLocalizations.of(context)!.changeLanguage),
+                trailing: Text(state.locale.languageCode.toUpperCase()),
+                onTap: () => _showLanguageSourceActionSheet(context),
+              ),
+              Divider(color: Colors.grey.withOpacity(0.3)),
+              _buildSectionTitle(context, AppLocalizations.of(context)!.account),
               ListTile(
                 leading: Icon(Icons.edit, color: AppStyles.primaryBlue),
-                title: Text("Profilə düzəliş et"),
+                title: Text(AppLocalizations.of(context)!.editProfile),
                 onTap: () {
                   context.router.push(EditProfileRoute());
                 },
               ),
               ListTile(
                 leading: Icon(Icons.delete_forever, color: Colors.red),
-                title: Text("Hesabı sil", style: TextStyle(color: Colors.red)),
+                title: Text(AppLocalizations.of(context)!.deleteAccount, style: TextStyle(color: Colors.red)),
                 onTap: () {
                   _showDeleteAccountDialog(context);
                 },
               ),
               Divider(color: Colors.grey.withOpacity(0.3)),
-              _buildSectionTitle(context, "Tətbiq Haqqında"),
+              _buildSectionTitle(context, AppLocalizations.of(context)!.aboutApp),
               ListTile(
                 leading: Icon(Icons.info_outline, color: Colors.grey),
-                title: Text("Versiya"),
+                title: Text(AppLocalizations.of(context)!.version),
                 trailing: Text("1.0.0"),
               ),
             ],
@@ -133,13 +143,13 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              title: Text("Hesabı sil"),
+              title: Text(AppLocalizations.of(context)!.deleteAccountDialogTitle),
               content: Text(
-                  "Hesabınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz."),
+                  AppLocalizations.of(context)!.deleteAccountDialogContent),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text("Xeyr"),
+                  child: Text(AppLocalizations.of(context)!.no),
                 ),
                 TextButton(
                   onPressed: () async {
@@ -155,13 +165,13 @@ class SettingsScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                             content: Text(
-                                "Xəta: Hesabı silmək üçün yenidən giriş etməlisiniz.")),
+                                AppLocalizations.of(context)!.deleteAccountReauthError)),
                       );
                       getIt<AuthService>().signOut();
                       context.router.replaceAll([LoginRoute()]);
                     }
                   },
-                  child: Text("Bəli, sil", style: TextStyle(color: Colors.red)),
+                  child: Text(AppLocalizations.of(context)!.yesDelete, style: TextStyle(color: Colors.red)),
                 ),
               ],
             ));
@@ -174,7 +184,7 @@ class SettingsScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: Icon(Icons.camera_alt, color: AppStyles.primaryBlue),
-              title: Text("Kamera"),
+              title: Text(AppLocalizations.of(context)!.camera),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(context, ImageSource.camera);
@@ -182,7 +192,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(Icons.photo_library, color: AppStyles.primaryBlue),
-              title: Text("Qalereya"),
+              title: Text(AppLocalizations.of(context)!.gallery),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(context, ImageSource.gallery);
@@ -191,12 +201,47 @@ class SettingsScreen extends StatelessWidget {
             if (context.read<SettingsBloc>().state.profileImageUrl != null)
               ListTile(
                 leading: Icon(Icons.delete, color: Colors.red),
-                title: Text("Şəkli sil", style: TextStyle(color: Colors.red)),
+                title: Text(AppLocalizations.of(context)!.removePhoto, style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(ctx);
                   context.read<SettingsBloc>().add(DeleteProfileImage());
                 },
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  }
+
+  void _showLanguageSourceActionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              title: Text("Azərbaycan"),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.read<SettingsBloc>().add(ChangeLanguage('az'));
+              },
+            ),
+            ListTile(
+              title: Text("English"),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.read<SettingsBloc>().add(ChangeLanguage('en'));
+              },
+            ),
+             ListTile(
+              title: Text("Русский"),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.read<SettingsBloc>().add(ChangeLanguage('ru'));
+              },
+            ),
           ],
         ),
       ),
@@ -209,7 +254,7 @@ class SettingsScreen extends StatelessWidget {
     if (picked != null) {
       context.read<SettingsBloc>().add(UpdateProfileImage(File(picked.path)));
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Profil şəkli yenilənir...")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.profilePhotoUpdating)),
       );
     }
   }
@@ -226,4 +271,3 @@ class SettingsScreen extends StatelessWidget {
     }
     return null;
   }
-}

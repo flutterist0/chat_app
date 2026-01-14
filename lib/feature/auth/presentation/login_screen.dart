@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/feature/auth/presentation/register_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
+import 'package:test_app/shared/routers/app_router.dart';
 import '../service/auth_service.dart';
 import '../logic/bloc/login/login_bloc.dart';
 import 'package:test_app/feature/auth/presentation/widgets/auth_header.dart';
@@ -15,6 +16,8 @@ import 'package:test_app/shared/themes/app_styles.dart';
 
 @RoutePage()
 class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -33,7 +36,6 @@ class _LoginViewState extends State<_LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
 
 
   @override
@@ -67,34 +69,34 @@ class _LoginViewState extends State<_LoginView> {
                       SizedBox(height: 60.h),
                       AuthHeader(
                         icon: Icons.chat_bubble_rounded,
-                        title: AppStrings.welcome,
-                        subTitle: AppStrings.loginAccount,
+                        title: AppLocalizations.of(context)!.welcome,
+                        subTitle: AppLocalizations.of(context)!.loginAccount,
                       ),
                       SizedBox(height: 40.h),
                       AuthTextField(
                         controller: _emailController,
-                        label: AppStrings.email,
-                        hint: AppStrings.emailPlaceholder,
+                        label: AppLocalizations.of(context)!.email,
+                        hint: AppLocalizations.of(context)!.emailPlaceholder,
                         prefixIcon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.enterEmail;
-                          if (!value.contains('@')) return AppStrings.correctValidEmail;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterEmail;
+                          if (!value.contains('@')) return AppLocalizations.of(context)!.validEmail;
                           return null;
                         },
                       ),
                       SizedBox(height: 16.h),
                       AuthTextField(
                         controller: _passwordController,
-                        label: AppStrings.password,
-                        hint: AppStrings.passwordHintText,
+                        label: AppLocalizations.of(context)!.password,
+                        hint: AppLocalizations.of(context)!.passwordHintText,
                         prefixIcon: Icons.lock_outlined,
                         isPassword: true,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.enterPassword;
-                          if (value.length < 6) return AppStrings.passwordLeastCharacter;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterPassword;
+                          if (value.length < 6) return AppLocalizations.of(context)!.passwordLeastCharacter;
                           return null;
                         },
                       ),
@@ -123,7 +125,7 @@ class _LoginViewState extends State<_LoginView> {
                           ),
                         )
                             : Text(
-                          AppStrings.login,
+                          AppLocalizations.of(context)!.login,
                           style: AppStyles.buttonText,
                         ),
                       ),
@@ -143,7 +145,7 @@ class _LoginViewState extends State<_LoginView> {
                         ),
                         icon: Icon(Icons.g_mobiledata, size: 32.sp, color: AppStyles.primaryBlue),
                         label: Text(
-                          "Google ilə davam et",
+                          AppLocalizations.of(context)!.continueWithGoogle,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -156,7 +158,7 @@ class _LoginViewState extends State<_LoginView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppStrings.dontHaveAccount,
+                            AppLocalizations.of(context)!.dontHaveAccount,
                             style: AppStyles.bodyText(context),
                           ),
                           GestureDetector(
@@ -164,7 +166,7 @@ class _LoginViewState extends State<_LoginView> {
                               context.router.push(RegisterRoute());
                             },
                             child: Text(
-                              AppStrings.toRegister,
+                              AppLocalizations.of(context)!.register,
                               style: AppStyles.linkText,
                             ),
                           ),
@@ -177,7 +179,7 @@ class _LoginViewState extends State<_LoginView> {
                         },
                         icon: Icon(Icons.manage_accounts, color: AppStyles.primaryBlue),
                         label: Text(
-                          "Yadda saxlanılan hesablar",
+                          AppLocalizations.of(context)!.savedAccounts,
                           style: TextStyle(color: AppStyles.primaryBlue),
                         ),
                       ),

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/auth/domain/repositories/auth_repository.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
 
@@ -50,7 +51,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Profil uğurla yeniləndi!"), backgroundColor: Colors.green),
+          SnackBar(content: Text(AppLocalizations.of(context)!.profileUpdatedSuccess), backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       }
@@ -69,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profilə Düzəliş"),
+        title: Text(AppLocalizations.of(context)!.editProfileTitle),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.sp),
@@ -80,12 +81,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: "Ad Soyad",
+                  labelText: AppLocalizations.of(context)!.fullName,
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 validator: (value) => 
-                    value == null || value.isEmpty ? "Ad boş ola bilməz" : null,
+                    value == null || value.isEmpty ? AppLocalizations.of(context)!.enterNameError : null,
               ),
               SizedBox(height: 16.h),
 
@@ -93,14 +94,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
-                  labelText: "Yeni Şifrə (Dəyişmək istəmirsinizsə boş buraxın)",
+                  labelText: AppLocalizations.of(context)!.newPasswordHint,
                   prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 obscureText: true,
                 validator: (value) {
                   if (value != null && value.isNotEmpty && value.length < 6) {
-                    return "Şifrə ən azı 6 simvol olmalıdır";
+                    return AppLocalizations.of(context)!.passwordLeastCharacter;
                   }
                   return null;
                 },
@@ -117,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   child: _isLoading 
                       ? CircularProgressIndicator(color: Colors.white)
-                      : Text("Yadda Saxla", style: TextStyle(fontSize: 16.sp, color: Colors.white)),
+                      : Text(AppLocalizations.of(context)!.save, style: TextStyle(fontSize: 16.sp, color: Colors.white)),
                 ),
               ),
             ],

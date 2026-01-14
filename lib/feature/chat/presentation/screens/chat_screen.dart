@@ -11,9 +11,9 @@ import 'package:test_app/feature/chat/logic/bloc/chat/chat_bloc.dart';
 import 'package:test_app/feature/chat/presentation/widgets/chat_header.dart';
 import 'package:test_app/feature/chat/presentation/widgets/chat_input_area.dart';
 import 'package:test_app/feature/chat/presentation/widgets/message_bubble.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class ChatScreen extends StatelessWidget {
@@ -65,14 +65,14 @@ class _ChatViewState extends State<_ChatView> {
             mainAxisSize: MainAxisSize.min,
             children: [
                Text(
-                AppStrings.deleteMessageTitle,
+                AppLocalizations.of(context)!.deleteMessageTitle,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
               ),
               const SizedBox(height: 20),
 
               ListTile(
                 leading: Icon(Icons.delete_outline, color: AppStyles.primaryBlue),
-                title: const Text(AppStrings.deleteForMe),
+                title: Text(AppLocalizations.of(context)!.deleteForMe),
                 onTap: () {
                   context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: false));
                   Navigator.pop(bottomSheetContext);
@@ -82,7 +82,7 @@ class _ChatViewState extends State<_ChatView> {
               if (message.isSentByMe)
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: Text(AppStrings.deleteForEveryone, style: TextStyle(color: AppStyles.red)),
+                  title: Text(AppLocalizations.of(context)!.deleteForEveryone, style: TextStyle(color: AppStyles.red)),
                   onTap: () {
                     context.read<ChatBloc>().add(DeleteMessage(message, forEveryone: true));
                     Navigator.pop(bottomSheetContext);
@@ -91,7 +91,7 @@ class _ChatViewState extends State<_ChatView> {
 
               ListTile(
                 leading: const Icon(Icons.close),
-                title: const Text(AppStrings.cancel),
+                title: Text(AppLocalizations.of(context)!.cancel),
                 onTap: () => Navigator.pop(bottomSheetContext),
               ),
             ],
@@ -171,7 +171,7 @@ class _ChatViewState extends State<_ChatView> {
                       return Center(child: Text('Xəta: ${state.errorMessage}'));
                     } else if (state.messages.isEmpty) {
                       return  Center(
-                          child: Text(AppStrings.noMessages,
+                          child: Text(AppLocalizations.of(context)!.noMessages,
                               style: AppStyles.emptyText));
                     }
 

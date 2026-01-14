@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class AppStyles {
   // Colors
@@ -138,7 +137,7 @@ class AppStyles {
   }
 
   static InputDecoration searchInputDecoration = InputDecoration(
-    hintText: AppStrings.searchHint,
+    hintText: 'Search...', // Placeholder until context is available
     hintStyle: TextStyle(color: white70),
     prefixIcon: Icon(Icons.search, color: white70),
     border: InputBorder.none,

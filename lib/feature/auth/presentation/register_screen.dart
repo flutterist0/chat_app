@@ -2,16 +2,18 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/feature/auth/logic/bloc/register/register_bloc.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/auth/presentation/widgets/auth_header.dart';
 import 'package:test_app/feature/auth/presentation/widgets/auth_text_field.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -45,7 +47,7 @@ class _RegisterViewState extends State<_RegisterView> {
             
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppStrings.registerSuccess),
+                content: Text(AppLocalizations.of(context)!.registerSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -83,19 +85,19 @@ class _RegisterViewState extends State<_RegisterView> {
                       SizedBox(height: 20.h),
                       AuthHeader(
                         icon: Icons.person_add_rounded,
-                        title: AppStrings.createAccount,
-                        subTitle: AppStrings.registerAndChat,
+                        title: AppLocalizations.of(context)!.createAccount,
+                        subTitle: AppLocalizations.of(context)!.registerAndChat,
                       ),
                       SizedBox(height: 32.h),
                       
                       AuthTextField(
                         controller: _nameController,
-                        label: AppStrings.fullName,
-                        hint: AppStrings.enterName,
+                        label: AppLocalizations.of(context)!.fullName,
+                        hint: AppLocalizations.of(context)!.enterName,
                         prefixIcon: Icons.person_outlined,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.enterNameError;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterNameError;
                           return null;
                         },
                       ),
@@ -103,14 +105,14 @@ class _RegisterViewState extends State<_RegisterView> {
                       
                       AuthTextField(
                         controller: _emailController,
-                        label: AppStrings.email,
-                        hint: AppStrings.emailPlaceholder,
+                        label: AppLocalizations.of(context)!.email,
+                        hint: AppLocalizations.of(context)!.emailPlaceholder,
                         prefixIcon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.enterEmail;
-                          if (!value.contains('@')) return AppStrings.correctValidEmail;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterEmail;
+                          if (!value.contains('@')) return AppLocalizations.of(context)!.validEmail;
                           return null;
                         },
                       ),
@@ -118,14 +120,14 @@ class _RegisterViewState extends State<_RegisterView> {
                       
                       AuthTextField(
                         controller: _passwordController,
-                        label: AppStrings.password,
-                        hint: AppStrings.passwordHintText,
+                        label: AppLocalizations.of(context)!.password,
+                        hint: AppLocalizations.of(context)!.passwordHintText,
                         prefixIcon: Icons.lock_outlined,
                         isPassword: true,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.enterPassword;
-                          if (value.length < 6) return AppStrings.passwordLeastCharacter;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterPassword;
+                          if (value.length < 6) return AppLocalizations.of(context)!.passwordLeastCharacter;
                           return null;
                         },
                       ),
@@ -133,14 +135,14 @@ class _RegisterViewState extends State<_RegisterView> {
                       
                       AuthTextField(
                         controller: _confirmPasswordController,
-                        label: AppStrings.confirmPassword,
-                        hint: AppStrings.passwordHintText,
+                        label: AppLocalizations.of(context)!.confirmPassword,
+                        hint: AppLocalizations.of(context)!.passwordHintText,
                         prefixIcon: Icons.lock_outlined,
                         isPassword: true,
                         enabled: !isLoading,
                         validator: (value) {
-                          if (value == null || value.isEmpty) return AppStrings.confirmPasswordError;
-                          if (value != _passwordController.text) return AppStrings.passwordMismatchError;
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.confirmPasswordError;
+                          if (value != _passwordController.text) return AppLocalizations.of(context)!.passwordMismatchError;
                           return null;
                         },
                       ),
@@ -171,7 +173,7 @@ class _RegisterViewState extends State<_RegisterView> {
                                 ),
                               )
                             : Text(
-                                AppStrings.registerAction,
+                                AppLocalizations.of(context)!.registerAction,
                                   style: AppStyles.buttonText,
                               ),
                       ),
@@ -191,7 +193,7 @@ class _RegisterViewState extends State<_RegisterView> {
                         ),
                         icon: Icon(Icons.g_mobiledata, size: 32.sp, color: AppStyles.primaryBlue),
                         label: Text(
-                          "Google ilə davam et",
+                          AppLocalizations.of(context)!.continueWithGoogle,
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -205,13 +207,13 @@ class _RegisterViewState extends State<_RegisterView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            AppStrings.alreadyHaveAccount,
+                            AppLocalizations.of(context)!.alreadyHaveAccount,
                             style: AppStyles.bodyText(context),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Text(
-                              AppStrings.loginAction,
+                              AppLocalizations.of(context)!.loginAction,
                               style: AppStyles.linkText,
                             ),
                           ),

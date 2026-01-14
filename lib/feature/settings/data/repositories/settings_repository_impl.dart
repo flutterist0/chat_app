@@ -27,4 +27,14 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> setNotificationsEnabled(bool enabled) async {
     await _prefs.setBool(_keyNotifications, enabled);
   }
+
+  @override
+  Future<String> getLanguageCode() async {
+    return _prefs.getString('language_code') ?? 'az'; 
+  }
+
+  @override
+  Future<void> setLanguageCode(String languageCode) async {
+    await _prefs.setString('language_code', languageCode);
+  }
 }

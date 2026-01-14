@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/logic/bloc/chat/chat_bloc.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class ChatInputArea extends StatelessWidget {
   final Chat chat;
@@ -51,13 +51,13 @@ class ChatInputArea extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "${AppStrings.replyingTo} ${state.replyMessage!.isSentByMe ? AppStrings.yourself : chat.name}",
+                              "${AppLocalizations.of(context)!.replyingTo} ${state.replyMessage!.isSentByMe ? AppLocalizations.of(context)!.yourself : chat.name}",
                               style: AppStyles.replyName,
                             ),
                             Text(
                               state.replyMessage!.text.length > 50 &&
                                       !state.replyMessage!.text.contains(' ')
-                                  ? AppStrings.photo
+                                  ? AppLocalizations.of(context)!.photo
                                   : state.replyMessage!.text,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -103,8 +103,8 @@ class ChatInputArea extends StatelessWidget {
                       child: TextField(
                         focusNode: focusNode,
                         controller: controller,
-                        decoration: const InputDecoration(
-                            hintText: AppStrings.typeMessage,
+                        decoration:  InputDecoration(
+                            hintText: AppLocalizations.of(context)!.typeMessage,
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 10)),

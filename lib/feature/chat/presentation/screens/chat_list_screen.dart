@@ -10,10 +10,10 @@ import 'package:test_app/feature/chat/presentation/screens/search_users_screen.d
 import 'package:test_app/feature/chat/presentation/widgets/chat_list_header.dart';
 import 'package:test_app/feature/chat/presentation/widgets/chat_list_item.dart';
 import 'package:test_app/feature/chat/presentation/widgets/custom_drawer.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class ChatsListScreen extends StatelessWidget {
@@ -79,7 +79,7 @@ class _ChatsListViewState extends State<_ChatsListView> {
                             children: [
                               Icon(Icons.chat_bubble_outline, size: 64.sp, color: Colors.grey),
                               SizedBox(height: 16.h),
-                              const Text(AppStrings.noChats),
+                              Text(AppLocalizations.of(context)!.noChats),
                             ],
                           ),
                         );

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/notification/presentation/screens/notification_screen.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -81,7 +82,7 @@ final VoidCallback logout;
               Divider(color: Colors.white30, thickness: 1),
               _DrawerMenuItem(
                 icon: Icons.manage_accounts_outlined,
-                title: 'Hesablar',
+                title: AppLocalizations.of(context)!.accounts,
                 onTap: () {
                   Navigator.pop(context);
                   context.router.push(AccountCenterRoute());
@@ -89,7 +90,7 @@ final VoidCallback logout;
               ),
               _DrawerMenuItem(
                 icon: Icons.settings_outlined,
-                title: 'Tənzimləmələr',
+                title: AppLocalizations.of(context)!.settingsTitle,
                 onTap: () {
                   Navigator.pop(context);
                   context.router.push(SettingsRoute());
@@ -97,7 +98,7 @@ final VoidCallback logout;
               ),
               _DrawerMenuItem(
                 icon: Icons.notifications_outlined,
-                title: 'Bildirişlər',
+                title: AppLocalizations.of(context)!.notificationsTitle,
                 onTap: () {
                   Navigator.pop(context); 
                   context.router.navigate(NotificationRoute());
@@ -125,7 +126,7 @@ final VoidCallback logout;
                       Icon(Icons.logout, size: 20.sp),
                       SizedBox(width: 8.w),
                       Text(
-                        'Çıxış',
+                        AppLocalizations.of(context)!.logout,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -147,16 +148,16 @@ final VoidCallback logout;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Çıxış'),
-        content: Text('Hesabdan çıxmaq istədiyinizə əminsiniz?'),
+        title: Text(AppLocalizations.of(context)!.logout),
+        content: Text(AppLocalizations.of(context)!.logoutDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Xeyr'),
+            child: Text(AppLocalizations.of(context)!.no),
           ),
           TextButton(
             onPressed: logout,
-            child: Text('Bəli', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context)!.yes, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

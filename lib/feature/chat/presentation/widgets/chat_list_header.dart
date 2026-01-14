@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class ChatListHeader extends StatelessWidget {
   final VoidCallback onMenuPressed;
@@ -28,7 +28,7 @@ class ChatListHeader extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppStrings.messagesTitle,
+                    AppLocalizations.of(context)!.messagesTitle,
                     style: AppStyles.headerWhite,
                   ),
                   IconButton(
@@ -43,7 +43,9 @@ class ChatListHeader extends StatelessWidget {
                 child: TextField(
                   style: AppStyles.inputTextWhite,
                   onChanged: onSearchChanged,
-                  decoration: AppStyles.searchInputDecoration,
+                  decoration: AppStyles.searchInputDecoration.copyWith(
+                    hintText: AppLocalizations.of(context)!.searchHint,
+                  ),
                 ),
               ),
             ],

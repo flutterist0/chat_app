@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/notification/data/models/notification_model.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
 
 class NotificationItem extends StatelessWidget {
@@ -78,7 +79,7 @@ class NotificationItem extends StatelessWidget {
                    ),
                    SizedBox(height: 8.h),
                    Text(
-                     _formatTime(notification.timestamp),
+                     _formatTime(context, notification.timestamp),
                      style: TextStyle(
                        fontSize: 12.sp,
                        color: Colors.grey,
@@ -93,14 +94,14 @@ class NotificationItem extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(BuildContext context, DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
     
     if (difference.inMinutes < 60) {
-      return "${difference.inMinutes} dəqiqə əvvəl";
+      return AppLocalizations.of(context)!.timeMinutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return "${difference.inHours} saat əvvəl";
+      return AppLocalizations.of(context)!.timeHoursAgo(difference.inHours);
     } else {
       return "${time.day}/${time.month}/${time.year}";
     }

@@ -7,10 +7,13 @@ import 'package:test_app/feature/auth/presentation/login_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
 import 'package:test_app/feature/notification/services/notification_service.dart';
 import 'package:test_app/firebase_options.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/feature/settings/logic/bloc/settings_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -42,8 +45,16 @@ class MyApp extends StatelessWidget {
           return BlocBuilder<SettingsBloc, SettingsState>(
             builder: (context, state) {
               return MaterialApp.router(
-                routerConfig: _appRouter.config(),
-                title: 'Flutter Demo',
+                  locale: state.locale,
+                  localizationsDelegates: [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  routerConfig: _appRouter.config(),
+                  title: 'Flutter Demo',
                 themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
                 theme: ThemeData(
                   brightness: Brightness.light,

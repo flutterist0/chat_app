@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/notification/logic/bloc/notification_bloc.dart';
 import 'package:test_app/feature/notification/presentation/widgets/notification_item.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
 
@@ -18,7 +19,7 @@ class NotificationScreen extends StatelessWidget {
 
     if (userId == null) {
       return Scaffold(
-        body: Center(child: Text("Zəhmət olmasa daxil olun")),
+        body: Center(child: Text(AppLocalizations.of(context)!.pleaseLogin)),
       );
     }
 
@@ -27,7 +28,7 @@ class NotificationScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "Bildirişlər",
+            AppLocalizations.of(context)!.notificationsTitle,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.white,
@@ -57,7 +58,7 @@ class NotificationScreen extends StatelessWidget {
              if (state is NotificationLoading) {
                return Center(child: CircularProgressIndicator());
              } else if (state is NotificationError) {
-               return Center(child: Text("Xəta: ${state.message}"));
+               return Center(child: Text("${AppLocalizations.of(context)!.error}: ${state.message}"));
              } else if (state is NotificationLoaded) {
                if (state.notifications.isEmpty) {
                  return Center(
@@ -66,7 +67,7 @@ class NotificationScreen extends StatelessWidget {
                      children: [
                        Icon(Icons.notifications_off_outlined, size: 60.sp, color: Colors.grey),
                        SizedBox(height: 16.h),
-                       Text("Bildiriş yoxdur", style: TextStyle(color: Colors.grey, fontSize: 16.sp)),
+                       Text(AppLocalizations.of(context)!.noNotifications, style: TextStyle(color: Colors.grey, fontSize: 16.sp)),
                      ],
                    ),
                  );
@@ -95,19 +96,19 @@ class NotificationScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Təmizlə"),
-        content: Text("Bütün bildirişləri silmək istədiyinizə əminsiniz?"),
+        title: Text(AppLocalizations.of(context)!.clearAll),
+        content: Text(AppLocalizations.of(context)!.clearAllDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text("Xeyr"),
+            child: Text(AppLocalizations.of(context)!.no),
           ),
           TextButton(
             onPressed: () {
                context.read<NotificationBloc>().add(ClearAllNotifications(userId));
                Navigator.pop(ctx);
             },
-            child: Text("Bəli", style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context)!.yes, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

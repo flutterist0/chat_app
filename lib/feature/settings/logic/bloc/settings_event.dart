@@ -14,4 +14,9 @@ class UpdateProfileImage extends SettingsEvent {
   UpdateProfileImage(this.image);
 }
 
+class ChangeLanguage extends SettingsEvent {
+  final String languageCode;
+  ChangeLanguage(this.languageCode);
+}
+
 class DeleteProfileImage extends SettingsEvent {}

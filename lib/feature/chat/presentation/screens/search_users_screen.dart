@@ -7,10 +7,10 @@ import 'package:test_app/feature/chat/data/models/user_profile.dart';
 import 'package:test_app/feature/chat/logic/bloc/search_user/search_user_bloc.dart';
 import 'package:test_app/feature/chat/presentation/widgets/search_user_header.dart';
 import 'package:test_app/feature/chat/presentation/widgets/user_list_item.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 @RoutePage()
 class SearchUsersScreen extends StatelessWidget {
@@ -45,8 +45,8 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
     Chat newChat = Chat(
       id: user.id,
       name: user.name,
-      lastMessage: AppStrings.newChat,
-      time: AppStrings.now,
+      lastMessage: AppLocalizations.of(context)!.newChat,
+      time: AppLocalizations.of(context)!.now,
       unreadCount: 0,
       isOnline: user.isOnline,
     );
@@ -91,8 +91,8 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
                         const SizedBox(height: 16),
                         Text(
                           state.allUsers.isEmpty 
-                              ? AppStrings.noUsersYet 
-                              : AppStrings.noUsersFound,
+                              ? AppLocalizations.of(context)!.noUsersYet 
+                              : AppLocalizations.of(context)!.noUsersFound,
                           style: TextStyle(
                             fontSize: 18.sp,
                             color: AppStyles.grey600,

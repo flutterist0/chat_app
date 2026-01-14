@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class SearchUserHeader extends StatelessWidget {
   final TextEditingController searchController;
@@ -34,7 +34,7 @@ class SearchUserHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    AppStrings.newMessage,
+                    AppLocalizations.of(context)!.newMessage,
                     style: AppStyles.headerWhiteSmall,
                   ),
                 ],
@@ -49,7 +49,7 @@ class SearchUserHeader extends StatelessWidget {
                   controller: searchController,
                   onChanged: onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: AppStrings.searchUserHint,
+                    hintText: AppLocalizations.of(context)!.searchUserHint,
                     hintStyle: TextStyle(color: AppStyles.grey500),
                     prefixIcon: Icon(Icons.search, color: AppStyles.grey600),
                     suffixIcon: searchController.text.isNotEmpty

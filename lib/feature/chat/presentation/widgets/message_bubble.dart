@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/chat/data/models/message.dart';
+import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
-import 'package:test_app/shared/utils/app_strings.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -64,7 +64,7 @@ class MessageBubble extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            message.replySender ?? AppStrings.user,
+                            message.replySender ?? AppLocalizations.of(context)!.user,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: message.isSentByMe ? AppStyles.white70 : AppStyles.primaryBlue,
@@ -73,7 +73,7 @@ class MessageBubble extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            _getPreviewText(message.replyText!),
+                            _getPreviewText(context, message.replyText!),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -146,9 +146,9 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  String _getPreviewText(String text) {
+  String _getPreviewText(BuildContext context, String text) {
     if (text.length > 50 && !text.contains(' ')) {
-      return AppStrings.photo;
+      return AppLocalizations.of(context)!.photo;
     }
     return text;
   }

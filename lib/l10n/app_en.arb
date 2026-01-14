@@ -1,0 +1,122 @@
+{
+  "welcome": "Welcome",
+  "loginAccount": "Login to your account",
+  "email": "Email",
+  "emailPlaceholder": "Enter your email",
+  "password": "Password",
+  "passwordHintText": "Enter your password",
+  "login": "Login",
+  "dontHaveAccount": "Don't have an account?",
+  "register": "Register",
+  "enterEmail": "Please enter email",
+  "enterPassword": "Please enter password",
+  "passwordLeastCharacter": "Password must be at least 6 characters",
+  "validEmail": "Please enter a valid email",
+  "continueWithGoogle": "Continue with Google",
+  "savedAccounts": "Saved accounts",
+  "registerSuccess": "Registration successful!",
+  "createAccount": "Create account",
+  "registerAndChat": "Register and start chatting",
+  "fullName": "Full Name",
+  "enterName": "Enter your name",
+  "enterNameError": "Please enter name",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordError": "Please confirm password",
+  "passwordMismatchError": "Passwords do not match",
+  "registerAction": "Register",
+  "alreadyHaveAccount": "Already have an account? ",
+  "loginAction": "Login",
+  "messagesTitle": "Messages",
+  "searchHint": "Search...",
+  "noChats": "You haven't talked to anyone yet",
+  "newMessage": "New Message",
+  "searchUserHint": "Search user...",
+  "noUsersFound": "User not found",
+  "noUsersYet": "No users yet",
+  "newChat": "New chat",
+  "now": "Now",
+  "deleteMessageTitle": "Delete message?",
+  "deleteForMe": "Delete for me",
+  "deleteForEveryone": "Delete for everyone",
+  "cancel": "Cancel",
+  "online": "Online",
+  "offline": "Offline",
+  "noMessages": "No messages yet.",
+  "replyingTo": "Replying to:",
+  "yourself": "Yourself",
+  "user": "User",
+  "photo": "📷 Photo",
+  "typeMessage": "Type a message...",
+  "settingsTitle": "Settings",
+  "notifications": "Notifications",
+  "receiveNotifications": "Receive notifications",
+  "appearance": "Appearance",
+  "darkMode": "Dark mode",
+  "account": "Account",
+  "editProfile": "Edit profile",
+  "deleteAccount": "Delete account",
+  "aboutApp": "About App",
+  "version": "Version",
+  "deleteAccountDialogTitle": "Delete account",
+  "deleteAccountDialogContent": "Are you sure you want to delete your account? This action cannot be undone.",
+  "no": "No",
+  "yesDelete": "Yes, delete",
+  "deleteAccountReauthError": "Error: You must re-login to delete the account.",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "removePhoto": "Remove photo",
+  "profilePhotoUpdating": "Updating profile photo...",
+  "editProfileTitle": "Edit Profile",
+  "save": "Save",
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "accountCenterTitle": "Account Center",
+  "newAccountLogin": "Login with new account",
+  "addAccount": "Add account",
+  "removeAccountDialogTitle": "Remove account",
+  "removeAccountDialogContent": "Are you sure you want to remove {email} from the list?",
+  "@removeAccountDialogContent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "yes": "Yes",
+  "switchAccountDialogTitle": "Switch account",
+  "switchAccountDialogContent": "Do you want to switch to {email}?",
+  "@switchAccountDialogContent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsTitle": "Notifications",
+  "clearAll": "Clear all",
+  "clearAllDialogContent": "Are you sure you want to delete all notifications?",
+  "noNotifications": "No notifications",
+  "timeMinutesAgo": "{minutes} minutes ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHoursAgo": "{hours} hours ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "language": "Language",
+  "changeLanguage": "Change Language",
+  "newPasswordHint": "New Password (leave blank to keep current)",
+  "pleaseLogin": "Please login",
+  "error": "Error",
+  "accounts": "Accounts",
+  "logout": "Logout",
+  "logoutDialogContent": "Are you sure you want to logout?"
+}
