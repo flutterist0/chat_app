@@ -291,4 +291,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutDialogContent => 'Are you sure you want to logout?';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get read => 'Read';
+
+  @override
+  String get unread => 'Unread';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get name => 'Name';
 }

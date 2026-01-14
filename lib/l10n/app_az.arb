@@ -90,5 +90,12 @@
   "error": "Xəta",
   "accounts": "Hesablar",
   "logout": "Çıxış",
-  "logoutDialogContent": "Hesabdan çıxmaq istədiyinizə əminsiniz?"
+  "logoutDialogContent": "Hesabdan çıxmaq istədiyinizə əminsiniz?",
+  "filter": "Filtr",
+  "all": "Hamısı",
+  "read": "Oxunmuş",
+  "unread": "Oxunmamış",
+  "sortBy": "Sırala",
+  "date": "Tarix",
+  "name": "Ad"
 }

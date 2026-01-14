@@ -190,6 +190,7 @@ class ChatService {
         unreadCount: myUnreadCount,
         isOnline: isOnline,
         photoUrl: photoUrl,
+        lastMessageTime: (chatData['lastMessageTime'] as Timestamp?)?.toDate(),
       );
     }).toList();
 

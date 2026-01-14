@@ -291,4 +291,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get logoutDialogContent => 'Вы уверены, что хотите выйти?';
+
+  @override
+  String get filter => 'Фильтр';
+
+  @override
+  String get all => 'Все';
+
+  @override
+  String get read => 'Прочитанные';
+
+  @override
+  String get unread => 'Непрочитанные';
+
+  @override
+  String get sortBy => 'Сортировать по';
+
+  @override
+  String get date => 'Дата';
+
+  @override
+  String get name => 'Имя';
 }

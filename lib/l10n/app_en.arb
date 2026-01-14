@@ -118,5 +118,12 @@
   "error": "Error",
   "accounts": "Accounts",
   "logout": "Logout",
-  "logoutDialogContent": "Are you sure you want to logout?"
+  "logoutDialogContent": "Are you sure you want to logout?",
+  "filter": "Filter",
+  "all": "All",
+  "read": "Read",
+  "unread": "Unread",
+  "sortBy": "Sort by",
+  "date": "Date",
+  "name": "Name"
 }

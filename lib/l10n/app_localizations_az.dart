@@ -291,4 +291,25 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get logoutDialogContent => 'Hesabdan çıxmaq istədiyinizə əminsiniz?';
+
+  @override
+  String get filter => 'Filtr';
+
+  @override
+  String get all => 'Hamısı';
+
+  @override
+  String get read => 'Oxunmuş';
+
+  @override
+  String get unread => 'Oxunmamış';
+
+  @override
+  String get sortBy => 'Sırala';
+
+  @override
+  String get date => 'Tarix';
+
+  @override
+  String get name => 'Ad';
 }
