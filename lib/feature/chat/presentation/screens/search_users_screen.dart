@@ -11,6 +11,7 @@ import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/feature/chat/service/friendship_service.dart';
 
 @RoutePage()
 class SearchUsersScreen extends StatelessWidget {
@@ -42,16 +43,29 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
   }
 
   void _startChat(BuildContext context, UserProfile user) {
-    Chat newChat = Chat(
-      id: user.id,
-      name: user.name,
-      lastMessage: AppLocalizations.of(context)!.newChat,
-      time: AppLocalizations.of(context)!.now,
-      unreadCount: 0,
-      isOnline: user.isOnline,
-    );
+    // FIX: Only allow chat if MUTUAL friends
+    final canChat = user.friendshipStatus == FriendshipStatus.mutual;
 
-    context.router.push(ChatRoute(chat: newChat));
+    if (canChat) {
+      final chat = Chat(
+        id: user.id,
+        name: user.name,
+        lastMessage: AppLocalizations.of(context)!.newChat,
+        time: AppLocalizations.of(context)!.now,
+        unreadCount: 0,
+        isOnline: user.isOnline,
+        photoUrl: user.photoUrl,
+      );
+      context.router.push(ChatRoute(chat: chat));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Söhbət etmək üçün dost olmalısınız (qarşılıqlı takib)"), // "Must be friends (mutual follow) to chat"
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -90,8 +104,8 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          state.allUsers.isEmpty 
-                              ? AppLocalizations.of(context)!.noUsersYet 
+                          state.allUsers.isEmpty
+                              ? AppLocalizations.of(context)!.noUsersYet
                               : AppLocalizations.of(context)!.noUsersFound,
                           style: TextStyle(
                             fontSize: 18.sp,
@@ -111,6 +125,15 @@ class _SearchUsersViewState extends State<_SearchUsersView> {
                     return UserListItem(
                       user: user,
                       onTap: () => _startChat(context, user),
+                      onFollow: () async {
+                         await getIt<FriendshipService>().sendFollowRequest(user.id);
+                      },
+                      onUnfollow: () async {
+                        await getIt<FriendshipService>().unfollowUser(user.id);
+                      },
+                      onAccept: () async {
+                         await getIt<FriendshipService>().acceptFollowRequest(user.id);
+                      },
                     );
                   },
                 );

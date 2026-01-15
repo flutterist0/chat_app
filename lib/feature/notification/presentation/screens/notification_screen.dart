@@ -8,6 +8,7 @@ import 'package:test_app/feature/notification/presentation/widgets/notification_
 import 'package:test_app/l10n/app_localizations.dart';
 import 'package:test_app/shared/injection_container.dart';
 import 'package:test_app/shared/themes/app_styles.dart';
+import 'package:test_app/feature/chat/service/friendship_service.dart';
 
 @RoutePage()
 class NotificationScreen extends StatelessWidget {
@@ -80,6 +81,16 @@ class NotificationScreen extends StatelessWidget {
                      notification: notification,
                      onTap: () {
                        context.read<NotificationBloc>().add(MarkAsRead(userId, notification.id));
+                     },
+                     onAccept: () async {
+                        if (notification.senderId != null) {
+                           await getIt<FriendshipService>().acceptFollowRequest(notification.senderId!, notification.id);
+                        }
+                     },
+                     onReject: () async {
+                        if (notification.senderId != null) {
+                           await getIt<FriendshipService>().rejectFollowRequest(notification.senderId!, notification.id);
+                        }
                      },
                    );
                  },

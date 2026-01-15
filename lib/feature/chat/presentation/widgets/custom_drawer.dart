@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:test_app/feature/notification/presentation/screens/notification_screen.dart';
 import 'package:test_app/l10n/app_localizations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:test_app/shared/routers/app_router.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -78,7 +80,61 @@ final VoidCallback logout;
                   fontSize: 14.sp,
                 ),
               ),
-              SizedBox(height: 40.h),
+              SizedBox(height: 20.h),
+              // StreamBuilder for Counts
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return SizedBox.shrink();
+                  final data = snapshot.data!.data() as Map<String, dynamic>?;
+                  final followers = data?['followersCount'] ?? 0;
+                  final following = data?['followingCount'] ?? 0;
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                           Navigator.pop(context);
+                           context.router.push(FollowersRoute(userId: FirebaseAuth.instance.currentUser!.uid));
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              '$followers',
+                              style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Followers', // Use AppLocalizations if available, or 'Takipçi'
+                              style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(width: 1, height: 30.h, color: Colors.white24),
+                      GestureDetector(
+                        onTap: () {
+                           Navigator.pop(context);
+                           context.router.push(FollowingRoute(userId: FirebaseAuth.instance.currentUser!.uid));
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                              '$following',
+                              style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Following', // 'Takip'
+                              style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              SizedBox(height: 20.h),
               Divider(color: Colors.white30, thickness: 1),
               _DrawerMenuItem(
                 icon: Icons.manage_accounts_outlined,

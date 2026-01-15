@@ -17,6 +17,7 @@ import 'package:test_app/feature/notification/domain/repositories/notification_r
 
 import 'package:test_app/feature/notification/logic/bloc/notification_bloc.dart';
 import 'package:test_app/feature/chat/service/chat_service.dart';
+import 'package:test_app/feature/notification/services/notification_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test_app/feature/account/data/repositories/account_repository_impl.dart';
 import 'package:test_app/feature/account/domain/repositories/account_repository.dart';
@@ -26,6 +27,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_app/feature/settings/data/repositories/settings_repository_impl.dart';
 import 'package:test_app/feature/settings/domain/repositories/settings_repository.dart';
 import 'package:test_app/feature/settings/logic/bloc/settings_bloc.dart';
+import 'package:test_app/feature/chat/service/friendship_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -33,9 +35,12 @@ Future<void> setupLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton(() => sharedPreferences);
 
+  // Services
   getIt.registerLazySingleton<AuthService>(() => AuthService());
   getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt<AuthService>()));
-if (!getIt.isRegistered<FirebaseFirestore>()) {
+  getIt.registerLazySingleton<ChatService>(() => ChatService());
+  getIt.registerLazySingleton<FriendshipService>(() => FriendshipService(getIt(), getIt()));
+  if (!getIt.isRegistered<FirebaseFirestore>()) {
      getIt.registerLazySingleton(() => FirebaseFirestore.instance);
   }
   if (!getIt.isRegistered<FirebaseAuth>()) {
@@ -54,7 +59,6 @@ if (!getIt.isRegistered<FirebaseFirestore>()) {
     getIt.registerLazySingleton(() => ImagePicker());
   }
 
-  getIt.registerLazySingleton<ChatService>(() => ChatService());
   getIt.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(getIt<ChatService>(), getIt<ImagePicker>()));
 
   getIt.registerFactory<ChatBloc>(

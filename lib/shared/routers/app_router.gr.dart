@@ -43,6 +43,26 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const EditProfileScreen(),
       );
     },
+    FollowersRoute.name: (routeData) {
+      final args = routeData.argsAs<FollowersRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: FollowersScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
+    FollowingRoute.name: (routeData) {
+      final args = routeData.argsAs<FollowingRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: FollowingScreen(
+          key: args.key,
+          userId: args.userId,
+        ),
+      );
+    },
     LoginRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -159,6 +179,82 @@ class EditProfileRoute extends PageRouteInfo<void> {
   static const String name = 'EditProfileRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [FollowersScreen]
+class FollowersRoute extends PageRouteInfo<FollowersRouteArgs> {
+  FollowersRoute({
+    Key? key,
+    required String userId,
+    List<PageRouteInfo>? children,
+  }) : super(
+          FollowersRoute.name,
+          args: FollowersRouteArgs(
+            key: key,
+            userId: userId,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'FollowersRoute';
+
+  static const PageInfo<FollowersRouteArgs> page =
+      PageInfo<FollowersRouteArgs>(name);
+}
+
+class FollowersRouteArgs {
+  const FollowersRouteArgs({
+    this.key,
+    required this.userId,
+  });
+
+  final Key? key;
+
+  final String userId;
+
+  @override
+  String toString() {
+    return 'FollowersRouteArgs{key: $key, userId: $userId}';
+  }
+}
+
+/// generated route for
+/// [FollowingScreen]
+class FollowingRoute extends PageRouteInfo<FollowingRouteArgs> {
+  FollowingRoute({
+    Key? key,
+    required String userId,
+    List<PageRouteInfo>? children,
+  }) : super(
+          FollowingRoute.name,
+          args: FollowingRouteArgs(
+            key: key,
+            userId: userId,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'FollowingRoute';
+
+  static const PageInfo<FollowingRouteArgs> page =
+      PageInfo<FollowingRouteArgs>(name);
+}
+
+class FollowingRouteArgs {
+  const FollowingRouteArgs({
+    this.key,
+    required this.userId,
+  });
+
+  final Key? key;
+
+  final String userId;
+
+  @override
+  String toString() {
+    return 'FollowingRouteArgs{key: $key, userId: $userId}';
+  }
 }
 
 /// generated route for

@@ -8,6 +8,7 @@ import 'package:test_app/feature/chat/data/models/chat.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_list_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:test_app/feature/chat/presentation/screens/search_users_screen.dart';
+import 'package:test_app/feature/chat/presentation/screens/relationship_screens.dart';
 import 'package:test_app/feature/notification/presentation/screens/notification_screen.dart';
 import 'package:test_app/feature/settings/presentation/screens/edit_profile_screen.dart';
 import 'package:test_app/feature/settings/presentation/screens/settings_screen.dart';
@@ -29,6 +30,8 @@ class AppRouter extends _$AppRouter {
       AutoRoute(page: ChatsListRoute.page),
       AutoRoute(page: ChatRoute.page),
       AutoRoute(page: SearchUsersRoute.page),
+      AutoRoute(page: FollowersRoute.page),
+      AutoRoute(page: FollowingRoute.page),
       AutoRoute(page: EditProfileRoute.page),
       AutoRoute(page: NotificationRoute.page)
   ];

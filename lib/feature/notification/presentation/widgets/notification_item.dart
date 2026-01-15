@@ -7,11 +7,15 @@ import 'package:test_app/shared/themes/app_styles.dart';
 class NotificationItem extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
+  final VoidCallback? onAccept;
+  final VoidCallback? onReject;
 
   const NotificationItem({
     super.key,
     required this.notification,
     required this.onTap,
+    this.onAccept,
+    this.onReject,
   });
 
   @override
@@ -78,6 +82,11 @@ class NotificationItem extends StatelessWidget {
                      overflow: TextOverflow.ellipsis,
                    ),
                    SizedBox(height: 8.h),
+                   if (notification.type == 'follow_request')
+                     Padding(
+                       padding: EdgeInsets.only(bottom: 8.h),
+                       child: _buildRequestContent(),
+                     ),
                    Text(
                      _formatTime(context, notification.timestamp),
                      style: TextStyle(
@@ -93,6 +102,80 @@ class NotificationItem extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildRequestContent() {
+    if (notification.status == 'pending') {
+      return Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: onAccept,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppStyles.primaryBlue,
+                foregroundColor: Colors.white,
+                minimumSize: Size(0, 36.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text('Qəbul et', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: onReject,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: BorderSide(color: Colors.red),
+                minimumSize: Size(0, 36.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text('Rədd et', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      );
+    } else if (notification.status == 'accepted') {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green.withOpacity(0.5)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle, size: 16.sp, color: Colors.green),
+            SizedBox(width: 8.w),
+            Text(
+              'Qəbul edildi', 
+              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    } else if (notification.status == 'rejected') {
+      return Container(
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.red[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.red.withOpacity(0.5)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.cancel, size: 16.sp, color: Colors.red),
+            SizedBox(width: 8.w),
+            Text(
+              'Rədd edildi',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox.shrink();
+  }
+
 
   String _formatTime(BuildContext context, DateTime time) {
     final now = DateTime.now();
